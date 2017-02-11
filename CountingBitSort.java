@@ -34,6 +34,35 @@ public class CountingBitSort {
         return ((ary[x] >>> y) & 1) != 0;
     }
 
+    /**
+     * @param k
+     * @return
+     */
+    public int[] top(int k) {
+        int[] r = new int[k];
+        int total = 0, ki = 0;
+        for (int i = count.length - 1; i >= 1; i--) {
+            if ((total += (count[i] - count[i - 1])) <= k && (count[i] - count[i - 1]) > 0) {
+                int base = (i - 1) << BITS;
+                for (int j = MASK - 1; j >= 0; j--) {
+                    if (((ary[i - 1] >>> j) & 1) != 0) r[ki++] = base + j;
+                }
+            }
+            if (total > k) {
+                int base = (i - 1) << BITS;
+                for (int j = MASK - 1; j >= 0; j--) {
+                    if (((ary[i - 1] >>> j) & 1) != 0 && ki < k) r[ki++] = base + j;
+                }
+                break;
+            }
+        }
+        if (ki != k) return Arrays.copyOf(r, ki);
+        return r;
+    }
+
+    /**
+     * getIndex之前的预处理
+     */
     public void postSort() {
         this.count = new int[ary.length + 1];
         int total = 0;
@@ -61,7 +90,7 @@ public class CountingBitSort {
     public static void main(String[] args) {
         long et, st = System.currentTimeMillis();
         CountingBitSort cb = new CountingBitSort(Integer.MAX_VALUE);
-        for (int i = Integer.MAX_VALUE - 1; i >= 0; i--) {
+        for (int i = Integer.MAX_VALUE; i >= 0; i--) {
             cb.sort(i);
         }
         et = System.currentTimeMillis();
@@ -75,5 +104,12 @@ public class CountingBitSort {
         }
         et = System.currentTimeMillis();
         System.out.println("sort checking:" + (et - st) / 1000d);
+        st = System.currentTimeMillis();
+        int[] r = cb.top(65);
+        for (int i : r) {
+            System.out.println(i);
+        }
+        et = System.currentTimeMillis();
+        System.out.println("top k:" + (et - st) / 1000d);
     }
 }

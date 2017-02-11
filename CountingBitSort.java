@@ -40,20 +40,13 @@ public class CountingBitSort {
      */
     public int[] top(int k) {
         int[] r = new int[k];
-        int total = 0, ki = 0;
+        int ki = 0;
         for (int i = count.length - 1; i >= 1; i--) {
-            if ((total += (count[i] - count[i - 1])) <= k && (count[i] - count[i - 1]) > 0) {
-                int base = (i - 1) << BITS;
-                for (int j = MASK - 1; j >= 0; j--) {
-                    if (((ary[i - 1] >>> j) & 1) != 0) r[ki++] = base + j;
-                }
-            }
-            if (total > k) {
+            if (count[i] - count[i - 1] > 0) {
                 int base = (i - 1) << BITS;
                 for (int j = MASK - 1; j >= 0; j--) {
                     if (((ary[i - 1] >>> j) & 1) != 0 && ki < k) r[ki++] = base + j;
                 }
-                break;
             }
         }
         if (ki != k) return Arrays.copyOf(r, ki);

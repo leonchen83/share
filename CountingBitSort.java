@@ -42,11 +42,10 @@ public class CountingBitSort {
         int[] r = new int[k];
         int ki = 0;
         for (int i = count.length - 1; i >= 1; i--) {
-            if (count[i] - count[i - 1] > 0) {
-                int base = (i - 1) << BITS;
-                for (int j = MASK - 1; j >= 0; j--) {
-                    if (((ary[i - 1] >>> j) & 1) != 0 && ki < k) r[ki++] = base + j;
-                }
+            if (count[i] - count[i - 1] <= 0) continue;
+            int base = (i - 1) << BITS;
+            for (int j = MASK - 1; j >= 0; j--) {
+                if (((ary[i - 1] >>> j) & 1) != 0 && ki < k) r[ki++] = base + j;
             }
         }
         if (ki != k) return Arrays.copyOf(r, ki);

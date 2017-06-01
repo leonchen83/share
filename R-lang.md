@@ -1,0 +1,7 @@
+[class and method](http://www.cyclismo.org/tutorial/R/s4Classes.html#creating-an-s4-class)  
+[modules](https://cran.r-project.org/web/packages/modules/vignettes/modulesInR.html)  
+[packages](https://cran.r-project.org/doc/manuals/R-exts.html#Data-in-packages)  
+[rstudio](https://support.rstudio.com/hc/en-us/articles/200486488-Developing-Packages-with-RStudio)  
+[referenc](https://cran.r-project.org/doc/manuals/r-release/R-intro.html)  
+[namespace](http://r-pkgs.had.co.nz/namespace.html)  
+

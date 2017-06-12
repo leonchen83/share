@@ -27,13 +27,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ListenableFuture<T> implements CompletableFuture<T> {
 
     /**
-     * NEW -> COMPLETING -> COMPLETED
+     * NEW -> COMPLETING -> NORMAL
+     * NEW -> COMPLETING -> EXCEPTIONAL
      * NEW -> CANCELED
      */
     private static final int NEW = 0;
     private static final int COMPLETING = 1;
-    private static final int COMPLETED = 2;
-    private static final int CANCELED = 3;
+    private static final int NORMAL = 2;
+    private static final int EXCEPTIONAL = 3;
+    private static final int CANCELED = 4;
 
     protected volatile Object object;
 
@@ -65,13 +67,13 @@ public class ListenableFuture<T> implements CompletableFuture<T> {
 
     @Override
     public boolean isDone() {
-        return this.status.get() == COMPLETED;
+        return this.status.get() > COMPLETING;
     }
 
     /**
      * @return T value
-     * @throws InterruptedException link to {@link Future#get}
-     * @throws ExecutionException link to {@link Future#get}
+     * @throws InterruptedException  link to {@link Future#get}
+     * @throws ExecutionException    link to {@link Future#get}
      * @throws CancellationException link to {@link Future#get}
      */
     @Override
@@ -88,10 +90,10 @@ public class ListenableFuture<T> implements CompletableFuture<T> {
 
     /**
      * @return T value
-     * @throws InterruptedException link to {@link Future#get(long,TimeUnit)}
-     * @throws ExecutionException link to {@link Future#get(long,TimeUnit)}
-     * @throws TimeoutException link to {@link Future#get(long,TimeUnit)}
-     * @throws CancellationException link to {@link Future#get(long,TimeUnit)}
+     * @throws InterruptedException  link to {@link Future#get(long, TimeUnit)}
+     * @throws ExecutionException    link to {@link Future#get(long, TimeUnit)}
+     * @throws TimeoutException      link to {@link Future#get(long, TimeUnit)}
+     * @throws CancellationException link to {@link Future#get(long, TimeUnit)}
      */
     @Override
     public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
@@ -110,8 +112,8 @@ public class ListenableFuture<T> implements CompletableFuture<T> {
     public void complete(T t) {
         if (!this.status.compareAndSet(NEW, COMPLETING)) return;
         this.object = t;
+        this.status.set(NORMAL);
         latch.countDown();
-        if (!this.status.compareAndSet(COMPLETING, COMPLETED)) return;
         FutureListener<T> listener = this.listener;
         if (listener != null) listener.onComplete(this);
     }
@@ -120,8 +122,8 @@ public class ListenableFuture<T> implements CompletableFuture<T> {
     public void complete(Throwable t) {
         if (!this.status.compareAndSet(NEW, COMPLETING)) return;
         this.object = t;
+        this.status.set(EXCEPTIONAL);
         latch.countDown();
-        if (!this.status.compareAndSet(COMPLETING, COMPLETED)) return;
         FutureListener<T> listener = this.listener;
         if (listener != null) listener.onComplete(this);
     }

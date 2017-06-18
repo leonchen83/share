@@ -123,7 +123,7 @@ HMSetCommand{key='mkey', fields={mfield1=mvalue1}}
 2017-06-18 22:22:03.769 [main] INFO c.m.r.r.RedisSocketReplicator:273 - REPLCONF capa psync2
 2017-06-18 22:22:03.769 [main] INFO c.m.r.r.RedisSocketReplicator:277 - OK
 2017-06-18 22:22:03.769 [main] INFO c.m.r.r.RedisSocketReplicator:93 - PSYNC ? -1
-2017-06-18 22:22:03.770 [main] INFO c.m.r.r.RedisSocketReplicator:168 - FULLRESYNC 97f90bc305e34ad29c8c16e3024b15b5faa5832b 1
+2017-06-18 22:22:03.770 [main] INFO c.m.r.r.RedisSocketReplicator:168 - FULLRESYNC dd0334312c96a8054afc2143becb10ae5150ef13 1
 2017-06-18 22:22:03.866 [main] INFO c.m.r.r.RedisSocketReplicator:200 - RDB dump file size:719
 2017-06-18 22:22:03.868 [main] INFO c.m.r.r.r.RdbListener$Adaptor:40 - pre full sync
 2017-06-18 22:22:03.872 [main] INFO c.m.r.r.r.DefaultRdbVisitor:152 - RDB redis-ver: 3.2.3

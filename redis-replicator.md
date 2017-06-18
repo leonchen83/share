@@ -114,7 +114,7 @@ HMSetCommand{key='mkey', fields={mfield1=mvalue1}}
 ## 测试断线重连
 在上述的replicator开启过程中,在控制台可以观测到类似于如下的信息(redis版本不同信息也略有不同)  
 ```java
-2017-06-18 22:22:03.762 [main] INFO c.m.r.r.RedisSocketReplicator:244 - REPLCONF listening-port 57222
+2017-06-18 22:22:03.762 [main] INFO c.m.r.r.RedisSocketReplicator:244 - REPLCONF listening-port 34450
 2017-06-18 22:22:03.767 [main] INFO c.m.r.r.RedisSocketReplicator:248 - OK
 2017-06-18 22:22:03.767 [main] INFO c.m.r.r.RedisSocketReplicator:258 - REPLCONF ip-address 127.0.0.1
 2017-06-18 22:22:03.768 [main] INFO c.m.r.r.RedisSocketReplicator:262 - OK
@@ -131,5 +131,32 @@ HMSetCommand{key='mkey', fields={mfield1=mvalue1}}
 2017-06-18 22:22:03.874 [main] INFO c.m.r.r.r.DefaultRdbVisitor:152 - RDB ctime: 1497795723
 2017-06-18 22:22:03.875 [main] INFO c.m.r.r.r.DefaultRdbVisitor:152 - RDB used-mem: 565520
 ```
-我们可以观察到slave开启的端口是`57222`  
-然后women
+我们可以观察到slave开启的端口是`34450`  
+然后我们模拟一下断线  
+```java  
+iptables -I OUTPUT -p tcp --dport 34450 -j DROP
+iptables -I INPUT -p tcp --dport 34450 -j DROP
+```
+
+在控制台会观察到如下日志  
+```java
+2017-06-18 22:37:14.078 [main] INFO c.m.r.r.RedisSocketReplicator:352 - heartbeat canceled.
+2017-06-18 22:37:14.079 [main] INFO c.m.r.r.RedisSocketReplicator:374 - socket closed
+2017-06-18 22:37:14.079 [main] INFO c.m.r.r.RedisSocketReplicator:156 - reconnect to redis-server. retry times:1
+2017-06-18 22:37:15.080 [main] INFO c.m.r.r.RedisSocketReplicator:244 - REPLCONF listening-port 34472
+2017-06-18 22:37:15.080 [main] INFO c.m.r.r.RedisSocketReplicator:248 - OK
+2017-06-18 22:37:15.081 [main] INFO c.m.r.r.RedisSocketReplicator:258 - REPLCONF ip-address 127.0.0.1
+2017-06-18 22:37:15.081 [main] INFO c.m.r.r.RedisSocketReplicator:262 - OK
+2017-06-18 22:37:15.081 [main] INFO c.m.r.r.RedisSocketReplicator:273 - REPLCONF capa eof
+2017-06-18 22:37:15.081 [main] INFO c.m.r.r.RedisSocketReplicator:277 - OK
+2017-06-18 22:37:15.081 [main] INFO c.m.r.r.RedisSocketReplicator:273 - REPLCONF capa psync2
+2017-06-18 22:37:15.082 [main] INFO c.m.r.r.RedisSocketReplicator:277 - OK
+2017-06-18 22:37:15.082 [main] INFO c.m.r.r.RedisSocketReplicator:93 - PSYNC dd0334312c96a8054afc2143becb10ae5150ef13 225
+2017-06-18 22:37:15.082 [main] INFO c.m.r.r.RedisSocketReplicator:168 - CONTINUE
+2017-06-18 22:37:15.082 [main] INFO c.m.r.r.RedisSocketReplicator:297 - heartbeat thread started.
+```
+
+注意日志中的`CONTINUE`这表明部分同步起作用了,在此次重连同步中,不会再次同步rdb数据,而是直接从实时命令开始同步  
+
+## 更多高级功能
+参照[中文文档#高级主题](https://github.com/leonchen83/redis-replicator/blob/master/README.zh_CN.md#4-%E9%AB%98%E7%BA%A7%E4%B8%BB%E9%A2%98)  

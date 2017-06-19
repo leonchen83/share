@@ -49,7 +49,7 @@ master发送给slave的数据格式如下
 $wget https://github.com/antirez/redis/archive/4.0-rc3.tar.gz
 $tar -xvzf 4.0-rc3.tar.gz
 $cd redis-4.0-rc3
-$make
+$make MALLOC=libc
 $cd src
 $nohup ./redis-server ../redis.conf &
 
@@ -132,8 +132,11 @@ HMSetCommand{key='mkey', fields={mfield1=mvalue1}}
 2017-06-18 22:22:03.875 [main] INFO c.m.r.r.r.DefaultRdbVisitor:152 - RDB used-mem: 565520
 ```
 我们可以观察到slave开启的端口是`34450`  
-然后我们模拟一下断线  
-```java  
+顺便再验证一下之前讲的replication协议,关键log如下
+`PSYNC ? -1`  
+`FULLRESYNC dd0334312c96a8054afc2143becb10ae5150ef13 1`  
+然后我们模拟一下断线  
+```java  
 iptables -I OUTPUT -p tcp --dport 34450 -j DROP
 iptables -I INPUT -p tcp --dport 34450 -j DROP
 ```
@@ -155,8 +158,8 @@ iptables -I INPUT -p tcp --dport 34450 -j DROP
 2017-06-18 22:37:15.082 [main] INFO c.m.r.r.RedisSocketReplicator:168 - CONTINUE
 2017-06-18 22:37:15.082 [main] INFO c.m.r.r.RedisSocketReplicator:297 - heartbeat thread started.
 ```
-
-注意日志中的`CONTINUE`这表明部分同步起作用了,在此次重连同步中,不会再次同步rdb数据,而是直接从实时命令开始同步  
+断线重连之后首先发送`PSYNC dd0334312c96a8054afc2143becb10ae5150ef13 225` 这个offset 225是slave端记录的  
+然后注意日志中的`CONTINUE`这表明部分同步起作用了,在此次重连同步中,不会再次同步rdb数据,而是直接从实时命令开始同步  
 
 ## 更多高级功能
 参照[中文文档#高级主题](https://github.com/leonchen83/redis-replicator/blob/master/README.zh_CN.md#4-%E9%AB%98%E7%BA%A7%E4%B8%BB%E9%A2%98)  

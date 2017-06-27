@@ -159,7 +159,7 @@ iptables -I INPUT -p tcp --dport 34450 -j DROP
 2017-06-18 22:37:15.082 [main] INFO c.m.r.r.RedisSocketReplicator:297 - heartbeat thread started.
 ```
 断线重连之后首先发送`PSYNC dd0334312c96a8054afc2143becb10ae5150ef13 225` 这个offset 225是slave端记录的  
-然后注意日志中的`CONTINUE`这表明部分同步起作用了,在此次重连同步中,不会再次同步rdb数据,而是直接从实时命令开始同步  
+然后注意日志中的`CONTINUE`这表明部分同步起作用了,在此次重连同步中,不会再次同步rdb数据,而是直接从实时命令开始同步. 断线中写入redis master的数据, 并不会丢失.    
 
 ## 更多高级功能
 参照[中文文档#高级主题](https://github.com/leonchen83/redis-replicator/blob/master/README.zh_CN.md#4-%E9%AB%98%E7%BA%A7%E4%B8%BB%E9%A2%98)  

@@ -1,3 +1,4 @@
+* [Advanced R](http://adv-r.had.co.nz)  
 * [class and method](http://www.cyclismo.org/tutorial/R/s4Classes.html#creating-an-s4-class)  
 [modules](https://cran.r-project.org/web/packages/modules/vignettes/modulesInR.html)  
 [packages](https://cran.r-project.org/doc/manuals/R-exts.html#Data-in-packages)  

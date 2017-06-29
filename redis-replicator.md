@@ -38,9 +38,9 @@ master发送给slave的数据格式如下
 ## 其他实用的回调函数
 除`RdbListener` 以及 `CommandListener` 以外,还有其他实用的回调函数,但首先要多讲一下`RdbListener`  
 `RdbListener`里还有两个方法`preFullSync`,`postFullSync` 在同步rdb之前和之后分别触发这两个事件.  
-`CloseListener` 在调用replicator.close之后触发, 或者在异常退出时会触发此事件(仅触发一次)  
-`ExceptionListener` 在用户处理`rdb事件`或者`command事件`时发生异常会触发此事件  
-`AuxFieldListener` 在(redis 3.0以上) 同步真正的rdb数据之前,master会发送给slave一些类似于版本信息.通过监听此事件可以处理这些信息  
+`CloseListener` 在调用replicator.close之后触发, 或者在异常退出时会触发此事件(仅触发一次, 可以应用到发邮件提醒用户或者重启replicator)  
+`ExceptionListener` 在用户处理`rdb事件`或者`command事件`时发生运行时异常会触发此事件  
+`AuxFieldListener` 在(redis 3.0以上) 同步真正的rdb数据之前,master会发送给slave一些类似于版本信息, 内存占用等. 通过监听此事件可以处理这些信息  
 
 ## 单机版调试
 

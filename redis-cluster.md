@@ -3,5 +3,5 @@
 * clusterHandleSlaveMigration  
 * clusterUpdateSlotsConfigWith
 * clusterProcessPacket
-* clusterCron
 * clusterReadHandler
+* clusterCron

@@ -1,7 +1,9 @@
 # cluster.c
-* clusterSetMaster  
-* clusterHandleSlaveMigration  
+* clusterSetMaster
+* clusterHandleSlaveMigration
 * clusterUpdateSlotsConfigWith
 * clusterProcessPacket
 * clusterReadHandler
+* clusterAcceptHandler
 * clusterCron
+* clusterInit

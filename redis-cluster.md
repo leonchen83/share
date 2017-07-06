@@ -7,3 +7,4 @@
 * clusterAcceptHandler
 * clusterCron
 * clusterInit
+* [issue3929](https://github.com/antirez/redis/issues/3929)

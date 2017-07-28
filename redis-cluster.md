@@ -7,4 +7,5 @@
 * clusterAcceptHandler
 * clusterCron
 * clusterInit
-* [issue3929](https://github.com/antirez/redis/issues/3929)
+* [issue3929](https://github.com/antirez/redis/issues/3929)  
+* [issue2527](https://github.com/antirez/redis/issues/2527)  

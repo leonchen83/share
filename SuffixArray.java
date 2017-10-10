@@ -1,6 +1,20 @@
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+/*
+ * Copyright 2016-2017 Leon Chen
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import java.util.Arrays;
 
 /**
  * @author Leon Chen
@@ -12,23 +26,23 @@ public class SuffixArray {
     }
 
     private static String lcp(String str) {
-        List<SuffixItem> sa = sa(str);
-        Collections.sort(sa);
+        SuffixItem[] sa = sa(str);
+        Arrays.sort(sa);
         String c = "";
-        for (int i = 1; i < sa.size(); i++) {
-            String mc = sa.get(i - 1).common(sa.get(i));
+        for (int i = 1; i < sa.length; i++) {
+            String mc = sa[i - 1].common(sa[i]);
             if (mc.length() > c.length()) c = mc;
         }
         return c;
     }
 
-    private static List<SuffixItem> sa(String str) {
-        List<SuffixItem> list = new ArrayList<>(str.length());
+    private static SuffixItem[] sa(String str) {
+        SuffixItem[] sa = new SuffixItem[str.length()];
         char[] ary = str.toCharArray();
         for (int i = 0; i < ary.length; i++) {
-            list.add(new SuffixItem(i, ary));
+            sa[i] = new SuffixItem(i, ary);
         }
-        return list;
+        return sa;
     }
 
     private static class SuffixItem implements Comparable<SuffixItem> {

@@ -11,13 +11,13 @@
 在之前的开发中，经常有如下的需求  
   
 * Redis数据的跨机房同步
-* 异构数据的迁移；比如Redis到mysql,MQ
+* 异构数据的迁移；比如Redis到mysql，MQ
 
 Redis跨机房同步传统的方式通常采取双写的方式，这样会生产一种非常难以维护的用户代码；稍微好一点的做法是提炼出一个中间层。但也难以保证同时双写成功，因此又需要作复杂的异常处理，并且降低了程序的响应时间。除了双写的方式，还有一种方式是利用Redis自身的replication协议，让一台机器成为另一台机器的slave，用此种方式来同步数据。这种方式的问题是，双机房中必须有一个是master，一个是slave。在切换的过程中，需要作slave提升等处理，也变相增加了运维难度。特别是集群环境中，期望两个机房各一个集群，每个集群独立运行互不干扰，并且保持数据同步。  
 如图所示：  
 ![图1](./img1.jpg)
   
-上面一段属于同构数据迁移，再来说异构数据迁移，现实需求中，有可能会有异构迁移的情况，比如Redis每日数据量很大，需要把一些数据以文件或者数据库存储的方式落盘（mysql, MQ, SSDB..），每日异地备份等等，如果还是采用双写等方式处理的话，又会有代码扩张，维护困难等上述提过的问题。  
+上面一段属于同构数据迁移，再来说异构数据迁移，现实需求中，有可能会有异构迁移的情况，比如Redis每日数据量很大，需要把一些数据以文件或者数据库存储的方式落盘（mysql， MQ， SSDB..），每日异地备份等等，如果还是采用双写等方式处理的话，又会有代码扩张，维护困难等上述提过的问题。  
 如图所示：  
 ![图2](./img2.jpg)
   
@@ -31,11 +31,11 @@ Redis跨机房同步传统的方式通常采取双写的方式，这样会生产
 ![图3](./img3.jpg)  
 
 #### 2.1 第一个AOF
-第一个AOF的话是同步命令的回复，在同步之前我们要发送同步命令，比如2.8版本之前我们要发送`SYNC`, 2.8之后我们要发送`PSYNC repl-id repl-offset`开启PSYNC同步，repl-id占40字节，不知道repl-id的情况下发送`?`, repl-offset表示同步的offset，不知道offset的情况下发送`-1`,回复的话有可能是如下形式：`+FULLRESYNC repl-id offset\r\n`或者`+CONTINUE\r\n`或者Redis-4.0引入的PSYNC2回复`+CONTINUE repl-id\r\n`  
+第一个AOF的话是同步命令的回复，在同步之前我们要发送同步命令，比如2.8版本之前我们要发送`SYNC`， 2.8之后我们要发送`PSYNC repl-id repl-offset`开启PSYNC同步，repl-id占40字节，不知道repl-id的情况下发送`?`， repl-offset表示同步的offset，不知道offset的情况下发送`-1`，回复的话有可能是如下形式：`+FULLRESYNC repl-id offset\r\n`或者`+CONTINUE\r\n`或者Redis-4.0引入的PSYNC2回复`+CONTINUE repl-id\r\n`  
 
 #### 2.2 第二个AOF
-上面我们说第二个AOF是一个RESP Bulk String;那么其符合`$payload\r\nRDB\r\n`这样的形式，payload表示要传输的rdb大小，内容的话就是一个完整的RDB文件。关于RDB文件的格式，我做了一个[RDB data format wiki](https://github.com/leonchen83/redis-replicator/wiki/RDB-dump-data-format)供大家详细了解，在此不做赘述。稍微需要注意的是如果redis-server开启了`repl-diskless-sync = yes`那么这个格式会稍有变化。
-在[https://redis.io/topics/protocol](https://redis.io/topics/protocol) 文档中RESP Bulk String还有一种没有提到的格式用在同步协议中； `$EOF:<40 bytes delimiter>\r\nRDB<40 bytes delimiter>`,此时的payload变成`EOF:<40 bytes delimiter>`所以在实现同步协议的时候需要注意。第二点需要注意的是如果master产生的RDB特别巨大的时候，在同步RDB之前会发送连续的`\n`以此来维持与slave的连接。所以同步格的数据流有可能是这样的:  
+上面我们说第二个AOF是一个RESP Bulk String；那么其符合`$payload\r\nRDB\r\n`这样的形式，payload表示要传输的rdb大小，内容的话就是一个完整的RDB文件。关于RDB文件的格式，我做了一个[RDB data format wiki](https://github.com/leonchen83/redis-replicator/wiki/RDB-dump-data-format)供大家详细了解，在此不做赘述。稍微需要注意的是如果redis-server开启了`repl-diskless-sync = yes`那么这个格式会稍有变化。
+在[https://redis.io/topics/protocol](https://redis.io/topics/protocol) 文档中RESP Bulk String还有一种没有提到的格式用在同步协议中； `$EOF:<40 bytes delimiter>\r\nRDB<40 bytes delimiter>`，此时的payload变成`EOF:<40 bytes delimiter>`所以在实现同步协议的时候需要注意。第二点需要注意的是如果master产生的RDB特别巨大的时候，在同步RDB之前会发送连续的`\n`以此来维持与slave的连接。所以同步格的数据流有可能是这样的:  
 `+FULLRESYNC 8de1787ba490483314a4d30f1c628bc5025eb761 2443808505\r\n\n\n\n\n\n\n$payload\r\nRDB\r\n<其他AOF命令>`
 
 #### 2.3 其他的AOF
@@ -49,22 +49,22 @@ Redis跨机房同步传统的方式通常采取双写的方式，这样会生产
 通用的代码如下：
 
 ```java
-        Replicator replicator = new RedisReplicator("redis://127.0.0.1:6379");
+        Replicator replicator = new RedisReplicator("redis://127.0.0.1:6379")；
         replicator.addRdbListener(new RdbListener.Adaptor() {
             // 解析RDB事件
             @Override
             public void handle(Replicator replicator, KeyValuePair<?> kv) {
-                System.out.println(kv);
+                System.out.println(kv)；
             }
-        });
+        })；
         replicator.addCommandListener(new CommandListener() {
             // 解析AOF实时命令
             @Override
             public void handle(Replicator replicator, Command command) {
-                System.out.println(command);
+                System.out.println(command)；
             }
-        });
-        replicator.open();
+        })；
+        replicator.open()；
 ```
 
 ## 4. 设计可插拔式API以及开发中的取舍
@@ -76,7 +76,7 @@ Redis跨机房同步传统的方式通常采取双写的方式，这样会生产
 2. 当处理比如超过本机内存的大KV如何扩展
 3. 当加载Redis-4.0新特性Module（比如rejson）时如何扩展
 
-先讨论第一点，当升级Redis-server有新的命令而Redis-replicator不支持时，可以使用命令扩展。写一个命令解析器并注册进Redis-replicator中即可handle新的命令;一个详细的例子在此：[CommandExtensionExample](https://github.com/leonchen83/redis-replicator/blob/master/examples/com/moilioncircle/examples/extension/CommandExtensionExample.java)  
+先讨论第一点，当升级Redis-server有新的命令而Redis-replicator不支持时，可以使用命令扩展。写一个命令解析器并注册进Redis-replicator中即可handle新的命令；一个详细的例子在[CommandExtensionExample](https://github.com/leonchen83/redis-replicator/blob/master/examples/com/moilioncircle/examples/extension/CommandExtensionExample.java)  
   
 再讨论第二点，由于Redis-replicator默认是把KV完全读到内存再交由用户处理的，当处理比如超过本机内存的大KV时，会引发OOM。一个比较好的方法是以迭代的方式来处理大KV。在Redis-replicator中，可以注册自己的RDB解析器来应对这种情况，一个好消息是此工具已经内置了处理大KV的RDB解析器[ValueIterableRdbVisitor](https://github.com/leonchen83/redis-replicator/blob/master/src/main/java/com/moilioncircle/redis/replicator/rdb/iterable/ValueIterableRdbVisitor.java) ，
 与此相关的例子在[HugeKVSocketExample](https://github.com/leonchen83/redis-replicator/blob/master/examples/com/moilioncircle/examples/huge/HugeKVSocketExample.java)  
@@ -113,7 +113,7 @@ Redis跨机房同步传统的方式通常采取双写的方式，这样会生产
             <version>3.4.11</version>
         </dependency>
 ```
-这个包经常用在zookeeper客户端中比如curator-client,然而这个包依赖了一个很低版本的log4j,导致实际应该依赖log-api变成依赖于log实现库。在Redis-replicator中，依赖很少，仅依赖commons-logging。
+这个包经常用在zookeeper客户端中比如curator-client，然而这个包依赖了一个很低版本的log4j，导致实际应该依赖log-api变成依赖于log实现库。在Redis-replicator中，依赖很少，仅依赖commons-logging。
 
 ## 5. 总结
 以上就是我此次分享。感谢微信群主@鹏程。欢迎关注并star Redis-replicator。

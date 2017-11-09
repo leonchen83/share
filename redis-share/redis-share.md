@@ -19,16 +19,17 @@ Redis跨机房同步传统的方式通常采取双写的方式，这样会生产
   
 上面一段属于同构数据迁移，再来说异构数据迁移，现实需求中，有可能会有异构迁移的情况，比如Redis每日数据量很大，需要把一些数据以文件或者数据库存储的方式落盘（mysql， MQ， SSDB..），每日异地备份等等，如果还是采用双写等方式处理的话，又会有代码扩张，维护困难等上述提过的问题。  
 如图所示：  
-![图2](./img2.jpg)
+![图2](./img2.png)
   
 在以上的需求中，催生了我开发Redis-replicator的动机。 这个工具完美实现了Redis replication协议，并把RDB以及AOF解析成为一个一个的事件供用户消费，并且支持Redis4.0的新特性以及新命令。如果用Redis-replicator来实现上述需求的话，可以不干扰用户态的代码，单独用这个工具实现中间件来进行异构，同构数据同步备份等任务。  
-
+如图所示：  
+![图3](./img3.png)
 ## 2. Redis replication的协议简析
 
 讲到这里，就再仔细说一下Redis-replication协议，很多同学以为这个协议很复杂，实现起来很困难。但实际上如果仔细了解这个协议的话，即使用Java这种略臃肿的语言，在3000行内也可以实现一个完整的同步协议（Redis-replicator第一版5000行代码）。
 那么具体的协议格式是一个非严格的AOF格式；第一个AOF是同步命令的回复，第二个AOF命令很特殊，是一个RESP Bulk String，其内包含了RDB格式。其余的AOF就是master的实时命令。了解AOF格式的话请参照[https://redis.io/topics/protocol](https://redis.io/topics/protocol)  
 如图所示:  
-![图3](./img3.png)  
+![图4](img4.png)  
 
 #### 2.1 第一个AOF
 第一个AOF的话是同步命令的回复，在同步之前我们要发送同步命令，比如2.8版本之前我们要发送`SYNC`， 2.8之后我们要发送`PSYNC repl-id repl-offset`开启PSYNC同步，repl-id占40字节，不知道repl-id的情况下发送`?`， repl-offset表示同步的offset，不知道offset的情况下发送`-1`，回复的话有可能是如下形式：`+FULLRESYNC repl-id offset\r\n`或者`+CONTINUE\r\n`或者Redis-4.0引入的PSYNC2回复`+CONTINUE repl-id\r\n`  
@@ -44,7 +45,7 @@ Redis跨机房同步传统的方式通常采取双写的方式，这样会生产
 ## 3. Redis-repicator的设计与实现
 
 那么有了对以上同步协议的了解，我们可以很容易的实现一款自己的Redis同步协议。我所选的语言是Java，我鼓励大家也去实现不同语言的同步协议，以丰富Redis的工具链。Redis-replicator的结构如下所示  
-![图4](./img4.png)  
+![图5](img5.png)  
 
 通用的代码如下：
 
@@ -95,7 +96,7 @@ Redis跨机房同步传统的方式通常采取双写的方式，这样会生产
 ##### 4.2.1 无绪
 最近我读完一本书很有启发，书名叫<软件框架设计的艺术>:  
 
-![图5](./img5.png)  
+![图6](img6.png)  
 
 书中提到了一个叫`无绪`的概念；大意是当你依赖一个库，可以不用深入了解这个库的内部实现，就可直接根据API上手使用，并做出相对可靠的应用程序。对这个概念我深以为然，但是Redis-replicator是我写完之后才读的这本书，有一些不一致为了兼容性已经不可更改，但总体上根据Redis-replicator提供的文档以及example和对issue的快速回应以及修改可以让依赖此库风险可控。
 

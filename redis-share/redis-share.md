@@ -55,6 +55,10 @@ Redis跨机房同步传统的方式通常采取双写的方式，这样会生产
         replicator.open()；
 ```
 
+这里稍微对代码做一下解释，首先是Redis的URI表示`redis://127.0.0.1:6379`，这种表示通过socket进行数据同步，然而Redis-replicator也可以进行RDB以及AOF文件的解析，相应的URI为`redis:///path/to/dump.rdb`或`redis:///path/to/appendonly.aof`，其余的代码保持不变。
+RdbListener表示监听RDB事件，CommandListener表示监听AOF事件。所以我们可以仅仅更改URI来做到远程同步和文件解析之间的自由切换。  
+
+
 ## 3. Redis replication的协议简析
 
 讲到这里，就再仔细说一下Redis-replication协议，很多同学以为这个协议很复杂，实现起来很困难。但实际上如果仔细了解这个协议的话，即使用Java这种略臃肿的语言，在3000行内也可以实现一个完整的同步协议（Redis-replicator第一版5000行代码）。我鼓励大家也去实现不同语言的同步协议，以丰富Redis的工具链。  

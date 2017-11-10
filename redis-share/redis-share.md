@@ -127,6 +127,7 @@ RdbListener表示监听RDB事件，CommandListener表示监听AOF事件。所以
 这个包经常用在zookeeper客户端中比如curator-client，然而这个包依赖了一个很低版本的log4j，导致实际应该依赖log-api变成依赖于log实现库。在Redis-replicator中，依赖很少，仅依赖commons-logging。
 
 ## 5. 总结
-以上就是我此次分享。感谢微信群主@鹏程。欢迎关注并star Redis-replicator。
+以上就是我此次分享。限于分享篇幅和分享重点，并没有展现Redis-replicator的全部功能，比如此工具还可以做RDB及AOF文件的拆分与合并，RDB格式转redis的dump格式(和dump命令得到的格式一致)，以及RDB与AOF文件的备份和Redis-4.0混合格式的支持等。
+最后感谢微信群主@鹏程。欢迎关注并star Redis-replicator。
 
 

@@ -79,7 +79,7 @@ io，net，util包与Redis-replicator的网络传输以及内部用数据结构�
   
 rdb包和RDB事件相关，会把RDB的数据流解析成一个一个KeyValuePair并触发RdbListener。同时这个包也包含了Module解析和自定义RDB解析器相关的类。（重点的类有KeyValuePair，Module，ModuleParser，RdbVisitor，RdbParser）  
   
-还有根目录下的一些重点类：ReplicatorListener包含户所有可以注册的监听器，Replicator包含实现replication协议的重要接口，Configuration包含一切可配置的参数。  
+还有根目录下的一些重点类：ReplicatorListener包含用户所有可以注册的监听器，Configuration包含一切可配置的参数，Replicator是实现replication协议的重要接口。  
 
 ## 3. Redis replication的协议简析
 

@@ -72,15 +72,15 @@ $ end
 n <enter> 向下移动n行  
 /word 向下查找word  
 ? word 向上查找word  
-:n1, n2s/word1/word2/g 在n1与n2之间查找word1并替换为word2  
+:n1, n2s/word1/word2/g 在n1与n2之间查找word1并替换为word2  
 :1, $s/word1/word2/g 第一行与最后一行查找work1并替换word2  
-:1, $s/word1/word2/gc 第一行与最后一行查找work1并替换word2，并让用户确认  
-Dd 删除光标在的那一行  
-<n>dd 删除光标所在列的向下<n>行  
-Yy 复制光标所在行  
-<n>yy 复制光标所在列的<n>列  
-p or P 粘贴在光标下一列或上一列  
-U 恢复前一个动作  
+:1, $s/word1/word2/gc 第一行与最后一行查找work1并替换word2，并让用户确认  
+Dd 删除光标在的那一行  
+<n>dd 删除光标所在列的向下<n>行  
+Yy 复制光标所在行  
+<n>yy 复制光标所在列的<n>列  
+p or P 粘贴在光标下一列或上一列  
+U 恢复前一个动作  
 
 
 

@@ -61,8 +61,8 @@ killall redis
 /var/log/lastlog  
   
 最大文件打开数:  
-ulimit -a  
-  
+ulimit -a  
+  
 vim常用:  
 hjkl方向键  
 ctrl+f向前翻页  
@@ -81,13 +81,3 @@ Yy 复制光标所在行
 <n>yy 复制光标所在列的<n>列  
 p or P 粘贴在光标下一列或上一列  
 U 恢复前一个动作  
-
-
-
-
-
-
-
-
-
-

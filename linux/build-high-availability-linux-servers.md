@@ -88,4 +88,4 @@ U 恢复前一个动作
 查找:  
 (path下查找)find /path -name "*.log"  
 (当前目录查找)find . -name "*.log"  
-
+  

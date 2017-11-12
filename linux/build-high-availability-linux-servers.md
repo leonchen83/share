@@ -82,10 +82,10 @@ Yy 复制光标所在行
 p or P 粘贴在光标下一列或上一列  
 U 恢复前一个动作  
 
-日志:  
-(时间范围)cat /var/log/secure | sed -n '/12:48:48/,/12:48:55/p'  
-  
-查找:  
-(path下查找)find /path -name "*.log"  
-(当前目录查找)find . -name "*.log"  
+日志:  
+(时间范围)cat /var/log/secure | sed -n '/12:48:48/,/12:48:55/p'  
+  
+查找:  
+(path下查找)find /path -name "*.log"  
+(当前目录查找)find . -name "*.log"  
   

@@ -178,7 +178,7 @@ A: AOF文件转RDB这个工具还做不到，但反过来自己扩展一些代�
   
   
 Q: 消费慢，有统计过过达到多大的并发量？以及当消费慢对redis性能影响有数据统计吗？
-A: 消费慢的行为和Redis slave的行为一致，比如某台Redis slave消费慢，有可能产生无限重连的情况，这里redis-replicator和slave的行为是保持一致的，可能需要调整一些参数比如`repl-backlog-size`，`repl-backlog-ttl`，`repl-ping-slave-periods`。
+A: 消费慢的行为和Redis slave的行为一致，比如某台Redis slave消费慢，有可能产生无限重连的情况，这里redis-replicator和slave的行为是保持一致的，可能需要调整一些参数比如repl-backlog-size，repl-backlog-ttl，repl-ping-slave-periods。
   
   
 Q: 有因为各种原因中断后进行retry的功能吗？

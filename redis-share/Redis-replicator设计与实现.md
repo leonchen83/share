@@ -100,6 +100,10 @@ rdb包和RDB事件相关，会把RDB的数据流解析成一个一个KeyValuePai
 #### 3.3 其他的AOF
 参照[https://redis.io/topics/protocol](https://redis.io/topics/protocol)进行解析
 
+#### 3.4 心跳
+1. 在RDB传输完之后如果master端没有其他要同步的命令时，master会定时发送`PING`命令给replicator
+2. 在RDB传输完之后replicator要记录传输的字节数当作offset，定时给master发送`REPLCONF ACK offset`。
+
 ## 4. 设计可插拔式API以及开发中的取舍
 
 #### 4.1 设计可插拔式API

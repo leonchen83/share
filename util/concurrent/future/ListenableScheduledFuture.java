@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package concurrent.future;
+package util.concurrent.future;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Delayed;

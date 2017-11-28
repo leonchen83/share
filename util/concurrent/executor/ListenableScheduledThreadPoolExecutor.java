@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package concurrent.executor;
+package util.concurrent.executor;
 
-import concurrent.future.ExecutorListener;
-import concurrent.future.ListenableRunnableFuture;
-import concurrent.future.ListenableScheduledFuture;
+import util.concurrent.future.ExecutorListener;
+import util.concurrent.future.ListenableRunnableFuture;
+import util.concurrent.future.ListenableScheduledFuture;
 
 import java.util.List;
 import java.util.concurrent.*;

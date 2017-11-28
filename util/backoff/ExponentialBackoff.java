@@ -1,10 +1,10 @@
-package backoff;
+package util.backoff;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 /**
  * @author Baoyi Chen
- * @see <a href="https://en.wikipedia.org/wiki/Exponential_backoff">exponential backoff</a>
+ * @see <a href="https://en.wikipedia.org/wiki/Exponential_backoff">exponential util.backoff</a>
  * @see <a href="https://github.com/google/google-http-java-client/blob/master/google-http-client/src/main/java/com/google/api/client/util/ExponentialBackOff.java">ExponentialBackOff</a>
  */
 public class ExponentialBackoff implements Backoff {

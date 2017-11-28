@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-package com.moilioncircle.redis.replicator.io;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+package util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,23 +25,20 @@ import static java.lang.System.currentTimeMillis;
  * @author Leon Chen
  * @since 2.3.2
  */
-public class NewRateLimitInputStream extends InputStream {
-    private static final Log logger = LogFactory.getLog(RateLimitInputStream.class);
-
+public class RateLimitInputStream extends InputStream {
     private static final int DEFAULT_PERMITS = 100 * 1024 * 1000; // 97.65MB/sec
 
     private final int permits;
     private RateLimiter limiter;
     private final InputStream in;
 
-    public NewRateLimitInputStream(InputStream in) {
+    public RateLimitInputStream(InputStream in) {
         this(in, DEFAULT_PERMITS);
     }
 
-    public NewRateLimitInputStream(InputStream in, int permits) {
+    public RateLimitInputStream(InputStream in, int permits) {
         if (permits <= 1000) permits = 1000;
         else if (permits > 1000) permits = permits / 1000 * 1000;
-        logger.info("rate limit force set to " + permits);
 
         this.in = in;
         this.permits = permits;

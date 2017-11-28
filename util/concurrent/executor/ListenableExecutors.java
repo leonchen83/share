@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package concurrent.executor;
+package util.concurrent.executor;
 
 import java.util.concurrent.*;
 

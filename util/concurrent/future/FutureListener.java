@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package concurrent.future;
+package util.concurrent.future;
 
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 /**
  * @author Leon Chen
  * @since 1.0.0
  */
-public interface ExecutorListener {
-    void onTerminated(ExecutorService executor);
-
-    void beforeExecute(ExecutorService executor, ListenableRunnableFuture<?> future);
-
-    void afterExecute(ExecutorService executor, ListenableRunnableFuture<?> future, Throwable tx);
+@FunctionalInterface
+public interface FutureListener<T> {
+    void onComplete(Future<T> future);
 }

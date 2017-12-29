@@ -7,12 +7,6 @@
 
 ## 1. 系统定位与设计总则
 
-1. Library与Project
-2. 总则1: 避免喋喋不休
-3. 总则2: 要携带足够的信息
-4. 适用于Library的规则
-5. 适用于Project的规则
-
 ### 1.1. Library与Project
 
 定位一个工程是Library和Project可以根据此工程是否被其他工程依赖，依赖是指maven dependency的方式依赖，不是广义的依赖，

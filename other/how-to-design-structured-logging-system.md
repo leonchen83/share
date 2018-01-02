@@ -78,11 +78,6 @@
 
 ## 3. 设计结构化日志的一些常见技巧
 
-1. 动态配置
-2. 合理规划日志内容
-3. 性能取舍与异步写入
-4. 关于Library日志设计的技巧
-
 ### 3.1. 动态配置
 
 关于动态配置，主流的日志实现库都有定时读取配置的选项，例如在logback中，指定xml文件根节点的scan属性  
@@ -156,8 +151,10 @@ log4j2实现自定义appender的方法类似，但是log4j2的很多扩展是基
 ### 3.4. 关于Library日志设计的技巧
 
 前文在关于Library日志中，有一条规则是选取合适的API库，虽然遵循了这条规则，但还是有可能和客户现有的日志API有冲突怎么办？此节就来深入探讨这个问题。  
-还有一种方式来避免API库的冲突，就是采用类似netty的做法，包装API库为[InternalLogger](https://github.com/netty/netty/blob/4.1/common/src/main/java/io/netty/util/internal/logging/InternalLogger.java)和[InternalLoggerFactory](https://github.com/netty/netty/blob/4.1/common/src/main/java/io/netty/util/internal/logging/InternalLoggerFactory.java)。
+  
+可以采用类似netty方式来避免API库的冲突，包装API库为[InternalLogger](https://github.com/netty/netty/blob/4.1/common/src/main/java/io/netty/util/internal/logging/InternalLogger.java)和[InternalLoggerFactory](https://github.com/netty/netty/blob/4.1/common/src/main/java/io/netty/util/internal/logging/InternalLoggerFactory.java)。
 然后再把所有的主流API都包装一遍，用户可以自己指定用哪个API如`InternalLoggerFactory.setDefaultFactory(CommonsLoggerFactory.INSTANCE);`  
 
 ## 4. 总结
 
+以上就是针对Library和Project的设计结构化日志系统的技巧。在实践中读者可能找到更适合自己公司的日志最佳实践。本文不是教条的要求读者完全遵守，仅仅起到一个指导意义。谢谢。

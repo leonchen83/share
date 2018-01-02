@@ -45,7 +45,7 @@
 1. Project中，要选择一款适用于你们项目或者公司传统的日志实现库，比如你司在`logback`上有一定积累和开发了一定的周边工具，那么不要另类选择`log4j2`。不一致也会带给软件开发一定伤害。
 2. 要对异常日志进行包装，如果你们已经非常了解某一类异常产生的原因，可以不用记录异常堆栈，只记录自己包装的error message，更好的让日志满足总则1和2。
 实际上日志应该只记录Unexpected Exception的堆栈信息。
-3. 对不同的日志分文件显示， 比如访问日志分为（xx-system.access）, 跟踪日志分为(xx-system.trace)，事件日志分为(xx-system.event)，其他日志分为(xx-system.log)。
+3. 对不同的日志分文件显示， 比如访问日志分为（xx-system.access）, session日志为(xx-system.session)跟踪日志分为(xx-system.trace)，事件日志分为(xx-system.event)，其他日志分为(xx-system.log)。
 4. 和Library一样，Project日志对单个功能也要提供可配置的verbose开关，并且这些verbose配置是可推送或可动态配置的。以便追踪一些难以发现的问题。
 
 ## 2. 选择一款日志实现库和一款API
@@ -67,12 +67,13 @@
 在未来会一步一步蚕食`logback`的市场份额, 到那时日志实现库和API会更加分裂, 对每个开发者都有影响。
   
 这份历史引发了Java开发日志系统的乱象。而`slf4j-api`和`log4j-api`的版本管理更加剧了乱象，原因是由于采用maven的module来管理API和桥接库，即使API没有任何更新也会随着其他库的更新而增加版本。
-在一个依赖稍微多一些的Project中，不难发现会依赖多个版本的`slf4j-api`或`log4j-api`; 希望未来`slf4j`团队和`log4j`团队能正视这个问题，将依赖广泛的这两个API独立管理，使版本更稳定便于依赖。 
+在一个依赖稍微多一些的Project中，不难发现会依赖多个版本的`slf4j-api`或`log4j-api`; 希望未来`slf4j`团队和`log4j`团队能正视这个问题，将依赖广泛的这两个API库独立管理，使版本更稳定便于依赖。 
 下图是`slf4j-api` 和 `log4j-api` 版本的更新状况  
 ![图1](./image-1.png)  
 ![图2](./image-2.png)  
     
-在看这篇文章的开发者的你，我只希望不要随便造日志库的轮子，如果不小心你的库流行了之后，虽然会给你个人带来巨大声望，但是在开发届的影响有可能是负面的。试着改善现有的日志系统而不是发明轮子，也是一种贡献。
+在看这篇文章的开发者的你，我只希望不要随便造日志库的轮子，如果不小心你的库流行了之后，虽然会给你个人带来巨大声望，但是在开发届的影响有可能是负面的。
+试着改善现有的日志系统而不是发明轮子，也是一种贡献。
   
 
 ## 3. 设计结构化日志的一些常见技巧
@@ -114,11 +115,47 @@
 
 ### 3.2. 合理规划日志内容
 
+在前文中，已经根据日志类型对日志进行了相应的分类并输出到不同的文件中，文件的具体格式上，还可以做相应的细化。
+比如定义相应的前缀来清晰化日志内容，session日志登录和退出登录可以分别加前缀`i ` 与 `o ` session异常日志加`! `,可以通过前缀就了解日志的整体内容。
+对于要打印的对象，统一Java里该对象`toString()`的格式也是一个较好的习惯(事实上我希望你所有的对象的`toString`方法都能统一格式，一致性在软件开发中非常重要)。  
+  
+如何实现多日志文件也非常简单：每个文件指定不同的appender，并指定不同的logger引用这个appender即可，logback中类似于：  
 
+```xml  
 
-### 3.3. 合理规划日志级别
+<appender name="SESSION_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <fileNamePattern>./log/admapi.%d{yyyy-MM-dd}.session</fileNamePattern>
+    </rollingPolicy>
+    <encoder>
+        <pattern>%d{yy-MM-dd HH:mm:ss.SSS} %msg%n</pattern>
+        <outputPatternAsHeader>false</outputPatternAsHeader>
+    </encoder>
+</appender>
+
+<logger name="SESSION_LOGGER" additivity="false" >
+    <appender-ref ref="SESSION_APPENDER" />
+</logger>
+
+```
+
+如果你的程序使用slf4j-api为API库的话，需要用如下语句引入SESSION_LOGGER  
+`Logger session = LoggerFactory.getLogger("SESSION_LOGGER");`
 
 ### 3.4. 性能取舍与异步写入
+
+如果你做应用程序的性能分析就会发现，日志是一个IO操作很重的地方，在某些重CPU轻IO的应用中，日志可能会是应用程序的瓶颈（一定要先profiler确定瓶颈）。
+在logback中，没有默认的异步日志appender，有可能需要扩展RollingFileAppender实现一个异步的RollingFileAppender。当实现好之后再把这个自己实现的appender注册到配置文件中。
+如下所示：  
+```xml  
+
+<appender name="SESSION_APPENDER" class="your.package.name.YourAsyncRollingFileAppender">
+```
+  
+log4j2实现自定义appender的方法类似，但是log4j2的很多扩展是基于注解的，具体不再详述。  
+
+### 3.5. 关于Library日志设计的技巧
+
 
 ## 4. 总结
 

@@ -80,9 +80,8 @@
 
 1. 动态配置
 2. 合理规划日志内容
-3. 合理规划日志级别
-4. 性能取舍与异步写入
-5. 关于Library日志设计的技巧
+3. 性能取舍与异步写入
+4. 关于Library日志设计的技巧
 
 ### 3.1. 动态配置
 
@@ -142,7 +141,7 @@
 如果你的程序使用slf4j-api为API库的话，需要用如下语句引入SESSION_LOGGER  
 `Logger session = LoggerFactory.getLogger("SESSION_LOGGER");`
 
-### 3.4. 性能取舍与异步写入
+### 3.3. 性能取舍与异步写入
 
 如果你做应用程序的性能分析就会发现，日志是一个IO操作很重的地方，在某些重CPU轻IO的应用中，日志可能会是应用程序的瓶颈（一定要先profiler确定瓶颈）。
 在logback中，没有默认的异步日志appender，有可能需要扩展RollingFileAppender实现一个异步的RollingFileAppender。当实现好之后再把这个自己实现的appender注册到配置文件中。
@@ -154,8 +153,11 @@
   
 log4j2实现自定义appender的方法类似，但是log4j2的很多扩展是基于注解的，具体不再详述。  
 
-### 3.5. 关于Library日志设计的技巧
+### 3.4. 关于Library日志设计的技巧
 
+前文在关于Library日志中，有一条规则是选取合适的API库，虽然遵循了这条规则，但还是有可能和客户现有的日志API有冲突怎么办？此节就来深入探讨这个问题。  
+还有一种方式来避免API库的冲突，就是采用类似netty的做法，包装API库为[InternalLogger](https://github.com/netty/netty/blob/4.1/common/src/main/java/io/netty/util/internal/logging/InternalLogger.java)和[InternalLoggerFactory](https://github.com/netty/netty/blob/4.1/common/src/main/java/io/netty/util/internal/logging/InternalLoggerFactory.java)。
+然后再把所有的主流API都包装一遍，用户可以自己指定用哪个API如`InternalLoggerFactory.setDefaultFactory(CommonsLoggerFactory.INSTANCE);`  
 
 ## 4. 总结
 

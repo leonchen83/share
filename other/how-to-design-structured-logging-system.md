@@ -216,6 +216,7 @@
 在做了以上的包装之后，用户就可以简单的用
 `private static final InternalLogger logger = InternalLoggerFactory.getInstance(YourClass.class);`
 来替代具体的API库了，把细节都封装到这两个库中，在一定程度上来说，这是Library的终极解决方案。
+这个方案稍微有点瑕疵的地方是要求用户在Project层面避免使用多个API库以致默认加载失败，所以需要用户在maven中exclude掉不必要的API库，保持API库唯一。
 
 ## 4. 总结
 

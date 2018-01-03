@@ -214,7 +214,7 @@
 ```
 
 在做了以上的包装之后，用户就可以简单的用
-`private static final InternalLogger logger = InternalLoggerFactory.getInstance(PromiseNotifier.class);`
+`private static final InternalLogger logger = InternalLoggerFactory.getInstance(YourClass.class);`
 来替代具体的API库了，把细节都封装到这两个库中，在一定程度上来说，这是Library的终极解决方案。
 
 ## 4. 总结

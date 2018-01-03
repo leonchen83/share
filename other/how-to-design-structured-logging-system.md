@@ -164,7 +164,54 @@
 前文在关于Library日志中，有一条规则是选取合适的API库，虽然遵循了这条规则，但还是有可能和客户现有的日志API有冲突怎么办？此节就来深入探讨这个问题。  
   
 可以采用类似netty方式来避免API库的冲突，包装API库为[InternalLogger](https://github.com/netty/netty/blob/4.1/common/src/main/java/io/netty/util/internal/logging/InternalLogger.java)和[InternalLoggerFactory](https://github.com/netty/netty/blob/4.1/common/src/main/java/io/netty/util/internal/logging/InternalLoggerFactory.java)。
-然后再把所有的主流API都包装一遍，用户可以自己指定用哪个API如`InternalLoggerFactory.setDefaultFactory(CommonsLoggerFactory.INSTANCE);`  
+然后再把所有的主流API库都包装一遍，用户可以自己指定用哪个API库如`InternalLoggerFactory.setDefaultFactory(CommonsLoggerFactory.INSTANCE);`  
+如果没指定上述LoggerFactory，会有默认的加载策略，如下所示  
+
+```java  
+
+    private static InternalLoggerFactory newDefaultFactory(String name) {
+        InternalLoggerFactory f;
+        try {
+            f = new Slf4JLoggerFactory(true);
+            f.newInstance(name).debug("Using SLF4J as the default logging framework");
+        } catch (Throwable t1) {
+            try {
+                f = Log4JLoggerFactory.INSTANCE;
+                f.newInstance(name).debug("Using Log4J as the default logging framework");
+            } catch (Throwable t2) {
+                f = JdkLoggerFactory.INSTANCE;
+                f.newInstance(name).debug("Using java.util.logging as the default logging framework");
+            }
+        }
+        return f;
+    }
+```
+
+在maven的pom中，也要把所有的API库以依赖的方式引入进来，但要注意optional是true，如下所示  
+
+```xml  
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <optional>true</optional>
+    </dependency>
+```
 
 ## 4. 总结
 

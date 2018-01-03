@@ -213,6 +213,10 @@
     </dependency>
 ```
 
+在做了以上的包装之后，用户就可以简单的用
+`private static final InternalLogger logger = InternalLoggerFactory.getInstance(PromiseNotifier.class);`
+来替代具体的API库了，把细节都封装到这两个库中，在一定程度上来说，这是Library的终极解决方案。
+
 ## 4. 总结
 
 以上就是针对Library和Project的设计结构化日志系统的技巧。在实践中读者可能找到更适合自己公司的日志最佳实践。本文的规则不是教条的要求读者完全遵守，仅仅起到一个指导意义。谢谢。

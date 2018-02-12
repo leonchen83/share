@@ -37,7 +37,7 @@ public class ListenableFuture<T> implements CompletableFuture<T> {
     private static final int EXCEPTIONAL = 3;
     private static final int CANCELED = 4;
 
-    protected volatile Object object;
+    protected Object object; // happens-before
 
     protected volatile FutureListener<T> listener;
 

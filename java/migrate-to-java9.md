@@ -63,3 +63,9 @@ OS name: "windows 7", version: "6.1", arch: "amd64", family: "windows"
   
 编写新代码最好也按照jdk8的语法等编写, 因为一些字节码工具还没升级, 会导致一些问题(即使按照jdk8的语法写, 由于编译出来的字节码也不保证没问题), 比较好的方式是尽快升级依赖的jar包, 并升级到automatic module或者更严格的module模式.  
   
+# 一些有用的链接
+
+* [maven-compiler-plugin/examples/module-info](https://maven.apache.org/plugins/maven-compiler-plugin/examples/module-info.html)
+* [maven-jmod-plugin](https://maven.apache.org/plugins/maven-jmod-plugin/usage.html)
+* [jlink](https://docs.oracle.com/javase/9/tools/jlink.htm#JSWOR-GUID-CECAC52B-CFEE-46CB-8166-F17A8E9280E9)
+* [creating-a-modular-jar](https://www.packtpub.com/mapt/book/application_development/9781786461407/3/03lvl1sec29/creating-a-modular-jar)

@@ -69,3 +69,5 @@ OS name: "windows 7", version: "6.1", arch: "amd64", family: "windows"
 * [maven-jmod-plugin](https://maven.apache.org/plugins/maven-jmod-plugin/usage.html)
 * [jlink](https://docs.oracle.com/javase/9/tools/jlink.htm#JSWOR-GUID-CECAC52B-CFEE-46CB-8166-F17A8E9280E9)
 * [creating-a-modular-jar](https://www.packtpub.com/mapt/book/application_development/9781786461407/3/03lvl1sec29/creating-a-modular-jar)
+* [jdeps](https://docs.oracle.com/javase/9/tools/jdeps.htm#JSWOR690)
+* [how-to-build-java-9-dependencies-from-maven-dependencies](https://stackoverflow.com/questions/47080660/how-to-build-java-9-dependencies-from-maven-dependencies)

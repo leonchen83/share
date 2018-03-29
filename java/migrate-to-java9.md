@@ -58,3 +58,8 @@ OS name: "windows 7", version: "6.1", arch: "amd64", family: "windows"
 运行时也要添加如上命令行参数  
   
 `java xxx --add-exports=java.base/sun.nio.ch=ALL-UNNAMED --add-exports=java.base/jdk.internal.ref=ALL-UNNAMED --add-exports=java.base/jdk.internal.misc=ALL-UNNAMED --add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED --add-modules=java.xml.ws.annotation`
+  
+## step 7: 编写新代码时
+  
+编写新代码最好也按照jdk8的语法等编写, 因为一些字节码工具还没升级, 会导致一些问题  
+  

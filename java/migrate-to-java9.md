@@ -24,7 +24,7 @@ OS name: "windows 7", version: "6.1", arch: "amd64", family: "windows"
   
 ## step 3: 升级maven的compiler插件到3.7.0以上
   
-## step 4: 把一些不支持的api导出成ALL-UNNAMED, 并把source和target改成9
+## step 4: 把一些不支持的api导出成ALL-UNNAMED, 并把target改成9
   
 ```xml  
 
@@ -40,7 +40,7 @@ OS name: "windows 7", version: "6.1", arch: "amd64", family: "windows"
                     <arg>--add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED</arg>
                     <arg>--add-modules=java.xml.ws.annotation</arg>
                 </compilerArgs>
-                <source>9</source>
+                <source>8</source>
                 <target>9</target>
             </configuration>
         </plugin>

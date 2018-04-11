@@ -65,6 +65,7 @@ OS name: "windows 7", version: "6.1", arch: "amd64", family: "windows"
   
 # 一些有用的链接
 
+* [jigsaw cheat-sheet](https://zeroturnaround.com/rebellabs/java-9-modules-cheat-sheet)
 * [maven-compiler-plugin/examples/module-info](https://maven.apache.org/plugins/maven-compiler-plugin/examples/module-info.html)
 * [maven-jmod-plugin](https://maven.apache.org/plugins/maven-jmod-plugin/usage.html)
 * [jlink](https://docs.oracle.com/javase/9/tools/jlink.htm#JSWOR-GUID-CECAC52B-CFEE-46CB-8166-F17A8E9280E9)

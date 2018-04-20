@@ -7,8 +7,7 @@
 - Redis同步协议介绍
 - Redis-replicator介绍
 - 使用Redis需要避免的问题
-- 开发中的取舍
-- 关于开源
+- 开发中的取舍与开源
 
 ---
 <!-- *template: invert -->
@@ -429,8 +428,16 @@ public abstract class RdbVisitor {
 
 ---
 <!-- *template: invert -->
-# 关于开源
+## 开源现状与期待
 
+* 绝大多数的个人项目， 包括著名的个人项目，都缺乏人手维护。比如slf4j项目，由Ceki Gulcu一个人主力维护，由于缺乏维护者，导致slf4j现在还不能完全支持JDK9。Netty也由Norman Maurer主力维护，进展缓慢。
+
+* 参与开源
+- 提交有价值的issue或bug
+- 提交更多测试用例
+- 提交大的patch之前要与作者充分沟通
+- 修改bug, 改善文档与注释也是贡献
+    
 ---
 <!-- *template: invert -->
 # Redis同步协议与实践
@@ -438,8 +445,7 @@ public abstract class RdbVisitor {
 - Redis同步协议介绍
 - Redis-replicator介绍
 - 使用Redis需要避免的问题
-- 开发中的取舍
-- 关于开源
+- 开发中的取舍与开源
 
 ---
 <!-- *template: invert -->

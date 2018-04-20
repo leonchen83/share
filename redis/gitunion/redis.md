@@ -3,15 +3,80 @@
 <!-- $theme: gaia -->
 <!-- *template: invert -->
 # Redis同步协议与实践
-- 
+- Redis简介
 - Redis同步协议介绍
 - Redis-replicator介绍
 - 使用Redis需要避免的问题
 - 开发中的取舍
----
+- 关于开源
 
+---
 <!-- *template: invert -->
-# 1. Redis同步协议介绍
+# 1. Redis简介
+Redis是开源的, NoSQL数据库. 支持多种数据结构, 例如string, hash, list, set, zset, module. 通过Sentinel和Cluster提高可用性. 并支持主备同步与持久化到硬盘
+
+---
+<!-- *template: invert -->
+#### 简单使用
+
+```
+> telnet 127.0.0.1 6379
+> set string value
+> hmset map key1 value1 key2 value2
+> lpush list v1 v2 v3
+> get string
+> hmget map key1
+> lpop list
+```
+
+---
+<!-- *template: invert -->
+#### Redis的部署方式
+
+主从
+```
+   +---------+          +---------+
+   |  MASTER |--------->|  SLAVE  |
+   +---------+          +---------+
+```
+
+---
+<!-- *template: invert -->
+哨兵
+```
+   +----------+           +---------+          +---------+
+   |          |<--------->|  MASTER |--------->|  SLAVE  |
+   |          |           +---------+          +---------+
+   |          |           
+   |   Multi  |           +---------+          +---------+
+   | Sentinel |<--------->|  MASTER |--------->|  SLAVE  |
+   |   Nodes  |           +---------+          +---------+
+   |          |
+   |          |           +---------+          +---------+
+   |          |<--------->|  MASTER |--------->|  SLAVE  |
+   +----------+           +---------+          +---------+
+```
+
+---
+<!-- *template: invert -->
+集群
+```
+   +---------+          +---------+
+   |  MASTER |--------->|  SLAVE  |
+   +----+----+          +---------+
+        |
+   +----+----+          +---------+
+   |  MASTER |--------->|  SLAVE  |
+   +----+----+          +---------+
+        |
+   +----+----+          +---------+
+   |  MASTER |--------->|  SLAVE  |
+   +---------+          +---------+
+```
+
+---
+<!-- *template: invert -->
+# 2. Redis同步协议介绍
 
 ## 全量同步
 
@@ -130,7 +195,7 @@ VALUE    =  $value-type, (  $string
 
 ---
 <!-- *template: invert -->
-# 2. Redis-replicator介绍
+# 3. Redis-replicator介绍
 
 #### 项目地址
 
@@ -200,7 +265,7 @@ VALUE    =  $value-type, (  $string
 * 将巨大的key进行拆分解析, 同步
 ---
 <!-- *template: invert -->
-# 3. 使用Redis需要避免的问题
+# 4. 使用Redis需要避免的问题
 ## 一些通用规则
 * 避免过大的KV
 * 运行Redis保持至少双核
@@ -299,7 +364,7 @@ r.open();
 
 ---
 <!-- *template: invert -->
-# 4. 开发中的取舍
+# 5. 开发中的取舍
 在<软件框架设计的艺术>这本书中提到了几个概念
 1. 无绪
 所谓`无绪`，就是指某些事情并不需要对背后的原理、规则有深刻的理解，就可以使用。典型的，不懂得汽车的原理，但我们照样开车，而且开得还不错
@@ -364,11 +429,17 @@ public abstract class RdbVisitor {
 
 ---
 <!-- *template: invert -->
+# 关于开源
+
+---
+<!-- *template: invert -->
 # Redis同步协议与实践
+- Redis简介
 - Redis同步协议介绍
 - Redis-replicator介绍
 - 使用Redis需要避免的问题
 - 开发中的取舍
+- 关于开源
 
 ---
 <!-- *template: invert -->

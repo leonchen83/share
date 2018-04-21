@@ -16,7 +16,7 @@ Redis是开源的, NoSQL数据库. 支持多种数据结构, 例如string, hash,
 
 ---
 <!-- *template: invert -->
-#### 简单使用
+### 简单使用
 
 ```
 > telnet 127.0.0.1 6379
@@ -30,7 +30,7 @@ Redis是开源的, NoSQL数据库. 支持多种数据结构, 例如string, hash,
 
 ---
 <!-- *template: invert -->
-#### Redis的部署方式
+### Redis的部署方式
 
 主从
 ```
@@ -62,24 +62,24 @@ Redis是开源的, NoSQL数据库. 支持多种数据结构, 例如string, hash,
 <!-- *template: invert -->
 集群
 ```
-   +---------+          +---------+
-   |  MASTER |--------->|  SLAVE  |
-   +----+----+          +---------+
-        |
-   +----+----+          +---------+
-   |  MASTER |--------->|  SLAVE  |
-   +----+----+          +---------+
-        |
-   +----+----+          +---------+
-   |  MASTER |--------->|  SLAVE  |
-   +---------+          +---------+
+       +---------+          +---------+
+  +--->|  MASTER |--------->|  SLAVE  |
+  |    +----+----+          +---------+
+  |         |
+  |    +----+----+          +---------+
+  |    |  MASTER |--------->|  SLAVE  |
+  |    +----+----+          +---------+
+  |         |
+  |    +----+----+          +---------+
+  +--->|  MASTER |--------->|  SLAVE  |
+       +---------+          +---------+
 ```
 
 ---
 <!-- *template: invert -->
 # 2. Redis同步协议介绍
 
-## 全量同步
+### 全量同步
 
 ```
            +----------+            PSYNC(1)            +----------+
@@ -98,31 +98,31 @@ Redis是开源的, NoSQL数据库. 支持多种数据结构, 例如string, hash,
 ```
 ---
 <!-- *template: invert -->
-#### 1. PSYNC
+#### (1). PSYNC
 
 Slave发送`PSYNC ? -1`到Master
 
-#### 2. FULLRESYNC
+#### (2). FULLRESYNC
 
 Master执行bgsave, 保存一份RDB文件, 并给Slave回复`FULLRESYNC repl-id offset`, Slave要把这个`repl-id`和`repl-offset`保存在内存中, 以便下次增量同步时使用  
 
-#### 3. RDB
+#### (3). RDB
 
 之后Master会把这个RDB文件以Socket流的形式发送给Slave
 
 ---
 <!-- *template: invert -->
-#### 4. AOF
+#### (4). AOF
 
 如果在发送RDB的时间段Master有新的命令被==写入==, 会以AOF的形式写到Master的backlog, 并在RDB同步完之后再发给Slave, Slave会计算每条命令的大小, 并累加到repl-offset上
 
-#### 5. 心跳
+#### (5). 心跳
 
 在RDB同步完之后Master会定期给Slave发送`PING`命令以维持长链接, Slave也会定期给Master发送`REPLCONF ACK repl-offset`告诉Master自己同步的位置
 
 ---
 <!-- *template: invert -->
-## 增量同步
+### 增量同步
 
 ```
 
@@ -139,27 +139,27 @@ Master执行bgsave, 保存一份RDB文件, 并给Slave回复`FULLRESYNC repl-id 
 ```
 ---
 <!-- *template: invert -->
-#### 1. PSYNC
+#### (1). PSYNC
 
 Slave发送`PSYNC repl-id repl-offset`到Master, 这里的`repl-id`, `repl-offset`就是之前全量同步记录的值
 
-#### 2. CONTINUE
+#### (2). CONTINUE
 
 Master回复`CONTINUE`或者`CONTINUE repl-id`(Redis 4.0)
 
 ---
 <!-- *template: invert -->
-#### 3. AOF
+#### (3). AOF
 
 如果在断线期间内Master有新的命令被写入, 会以AOF的形式写到Master的backlog, 并在累积的AOF同步完之后再发给Slave, Slave会计算每条命令的大小, 并累加到repl-offset上
 
-#### 5. 心跳
+#### (4). 心跳
 
 Master会定期给Slave发送`PING`命令以维持长链接, Slave也会定期给Master发送`REPLCONF ACK repl-offset`告诉Master自己同步的位置
 
 ---
 <!-- *template: invert -->
-## 格式详解
+### 格式详解
 
 #### AOF
 `PSYNC repl-id repl-offset`等命令都是以AOF格式发送, AOF格式可以参考[https://redis.io/topics/protocol](https://redis.io/topics/protocol)
@@ -176,21 +176,19 @@ AOF形式是`*3\r\n$5\r\nPSYNC\r\n$1\r\n?\r\n$2\r\n-1\r\n`
 <!-- *template: invert -->
 #### RDB的E-BNF形式
 [https://github.com/leonchen83/redis-replicator/wiki/RDB-dump-data-format](https://github.com/leonchen83/redis-replicator/wiki/RDB-dump-data-format)
-
+`$payload\r\nRDB`
 ```
-RDB      =  'REDIS',$ver,[AUX],{SELECT,[RESIZE],{RECORD}},'0xFF',[$crc];
+RDB      =  'REDIS',$ver,[AUX],{SELECT,[RESIZE],{RECORD}},'0xFF',[$checksum];
 RECORD   =  [EXPIRED], KEY, VALUE;
 SELECT   =  '0xFE', $length;
 AUX      =  {'0xFA', $string, $string};
 RESIZE   =  '0xFB', $length, $length;
 EXPIRED  =  ('0xFD', $second) | ('0xFC', $millisecond);
 KEY      =  $string;
-VALUE    =  $value-type, (  $string
-                          | $list | $set | $zset
-                          | $hash | $zset2 | $module                
-                          | $module2 | $hashzipmap
-                          | $listziplist | $setintset
-                          | $zsetziplist | $hashziplist | $listquicklist
+VALUE    =  $value-type, ( $string | $list | $set | $zset
+                         | $hash | $zset2 | $module | $module2 
+                         | $hashzipmap | $listziplist | $setintset
+                         | $zsetziplist | $hashziplist | $listquicklist
                          );
 ```
 
@@ -198,10 +196,10 @@ VALUE    =  $value-type, (  $string
 <!-- *template: invert -->
 # 3. Redis-replicator介绍
 
-#### 项目地址
+### 项目地址
 
 [https://github.com/leonchen83/redis-replicator](https://github.com/leonchen83/redis-replicator)
-#### 依赖
+### 依赖
 ```xml
     <dependency>
         <groupId>com.moilioncircle</groupId>
@@ -211,7 +209,7 @@ VALUE    =  $value-type, (  $string
 ```
 ---
 <!-- *template: invert -->
-#### 设计的动机
+### 设计的动机
 ```
      +----------+                                           +----------+
      |          |                异构数据同步                 |          |
@@ -221,7 +219,7 @@ VALUE    =  $value-type, (  $string
      
 ```
 
-#### 解决的问题
+### 解决的问题
 ```
      +----------+                                           +----------+
      |          |  pretend as Slave to accept Master data   |          |
@@ -231,7 +229,7 @@ VALUE    =  $value-type, (  $string
 ```
 ---
 <!-- *template: invert -->
-#### 架构
+### 架构
 ```
 
      +----------+                 PSYNC                     +----------+
@@ -248,7 +246,7 @@ VALUE    =  $value-type, (  $string
 ```
 ---
 <!-- *template: invert -->
-#### 代码示例
+### 代码示例
 ```java
         // redis:///path/to/dump.rdb
         // redis:///path/to/appendonly.aof
@@ -269,7 +267,7 @@ VALUE    =  $value-type, (  $string
 ```
 ---
 <!-- *template: invert -->
-#### Redis-replicator的应用场景
+### Redis-replicator的应用场景
 * 解析RDB, AOF文件, 伪装Slave接收数据
 * 将RDB格式转化成dump格式并同步给另一个Redis
 * 异构数据的同步, 比如把Redis数据同步到Mysql
@@ -277,14 +275,14 @@ VALUE    =  $value-type, (  $string
 ---
 <!-- *template: invert -->
 # 4. 使用Redis需要避免的问题
-## 一些通用规则
+### 一些通用规则
 * 避免过大的KV
 * 运行Redis保持至少双核
-* 不要有太大的实例, 单实例8G以内, 并保留40%内存空间做bgsave
+* 不要有太大的实例, 单实例16G以内, 并保留40%内存空间做bgsave
 * 谨慎使用Redis cluster
 ---
 <!-- *template: invert -->
-## 无限同步问题
+### 无限同步问题
 
 ```
       New command
@@ -306,7 +304,7 @@ VALUE    =  $value-type, (  $string
 
 ---
 <!-- *template: invert -->
-## 单个KV过大导致查询慢
+### 单个KV过大导致查询慢
 ```
       REQ big key
            |
@@ -321,7 +319,7 @@ VALUE    =  $value-type, (  $string
 
 ---
 <!-- *template: invert -->
-## Migrate命令无法迁移大KV
+### Migrate命令无法迁移大KV
 
 ```
      +----------+                                 +----------+
@@ -338,11 +336,11 @@ VALUE    =  $value-type, (  $string
 
 # 大KV与大实例是万恶之源
 
-## 在设计之初就要考虑KV的规模与实例的规模
+### 在设计之初就要考虑KV的规模与实例的规模
 
 ---
 <!-- *template: invert -->
-## 在Redis-replicator中处理大KV
+### 在Redis-replicator中处理大KV
 ```java
 Replicator r = new RedisReplicator("redis:///path/to/dump.rdb");
 r.setRdbVisitor(new ValueIterableRdbVisitor(r));
@@ -362,7 +360,7 @@ r.open();
 
 ---
 <!-- *template: invert -->
-## Redis-replicator中处理大KV的原理
+### Redis-replicator中处理大KV的原理
 ```
 
      +-----------+   SMALL MAP KV 1(batch size = 128)  +----------+
@@ -386,7 +384,7 @@ API就如同恒星，一旦出现，便与我们永恒共存
 
 ---
 <!-- *template: invert -->
-## 接口还是抽象类
+### 接口还是抽象类
 Redis-replicator-1.0.x
 ```java
 public interface RdbVisitor {
@@ -426,9 +424,11 @@ public abstract class RdbVisitor {
 }
 ```
 
+这样保证用户升级Redis-replicator不会影响自己的`MyRdbVisitor`, 只有同时把Redis升级到3.2的时候才会抛出`UnsupportedOperationException`
+
 ---
 <!-- *template: invert -->
-## 一些不干净的依赖
+### 依赖相关的反面例子
 ```xml
         <dependency>
             <groupId>org.apache.zookeeper</groupId>
@@ -440,11 +440,11 @@ public abstract class RdbVisitor {
 
 ---
 <!-- *template: invert -->
-## 开源现状与期待
+### 开源现状
 
 * 绝大多数的个人项目， 包括著名的个人项目，都缺乏人手维护。比如slf4j项目，由Ceki Gulcu一个人主力维护，由于缺乏维护者，导致slf4j现在还不能完全支持JDK9。Netty也由Norman Maurer主力维护，进展缓慢。
 
-## 参与开源
+### 参与开源
 - 提交有价值的issue或bug
 - 提交更多测试用例
 - 提交大的patch之前要与作者充分沟通

@@ -35,7 +35,9 @@ Redis是开源的, NoSQL数据库. 支持多种数据结构, 例如string, hash,
 主从
 ```
    +---------+          +---------+
+   |         |          |         |
    |  MASTER |--------->|  SLAVE  |
+   |         |          |         |
    +---------+          +---------+
 ```
 
@@ -432,7 +434,7 @@ public abstract class RdbVisitor {
 
 * 绝大多数的个人项目， 包括著名的个人项目，都缺乏人手维护。比如slf4j项目，由Ceki Gulcu一个人主力维护，由于缺乏维护者，导致slf4j现在还不能完全支持JDK9。Netty也由Norman Maurer主力维护，进展缓慢。
 
-* 参与开源
+## 参与开源
 - 提交有价值的issue或bug
 - 提交更多测试用例
 - 提交大的patch之前要与作者充分沟通

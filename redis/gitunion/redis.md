@@ -278,7 +278,7 @@ VALUE    =  $value-type, ( $string | $list | $set | $zset
 ### 一些通用规则
 * 避免过大的KV
 * 运行Redis保持至少双核
-* 不要有太大的实例, 单实例16G以内, 并保留40%内存空间做bgsave
+* 不要有太大的实例, 单实例16G以内, 并保留50%内存空间做bgsave
 * 谨慎使用Redis cluster
 ---
 <!-- *template: invert -->

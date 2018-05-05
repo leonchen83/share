@@ -200,7 +200,7 @@ VALUE    =  $value-type, ( $string | $list | $set | $zset
 
 [https://github.com/leonchen83/redis-replicator](https://github.com/leonchen83/redis-replicator)
 ### 依赖
-```xml
+```xml  
     <dependency>
         <groupId>com.moilioncircle</groupId>
         <artifactId>redis-replicator</artifactId>
@@ -247,7 +247,7 @@ VALUE    =  $value-type, ( $string | $list | $set | $zset
 ---
 <!-- *template: invert -->
 ### 代码示例
-```java
+```java  
         // redis:///path/to/dump.rdb
         // redis:///path/to/appendonly.aof
         final Replicator r = new RedisReplicator("redis://127.0.0.1:6379");
@@ -341,7 +341,7 @@ VALUE    =  $value-type, ( $string | $list | $set | $zset
 ---
 <!-- *template: invert -->
 ### 在Redis-replicator中处理大KV
-```java
+```java  
 Replicator r = new RedisReplicator("redis:///path/to/dump.rdb");
 r.setRdbVisitor(new ValueIterableRdbVisitor(r));
 r.addRdbListener(new ValueIterableRdbListener(128) {
@@ -386,7 +386,7 @@ API就如同恒星，一旦出现，便与我们永恒共存
 <!-- *template: invert -->
 ### 接口还是抽象类
 Redis-replicator-1.0.x
-```java
+```java  
 public interface RdbVisitor {
     Event applyString(RedisInputStream in, DB db, int version) throws IOException
 }
@@ -403,7 +403,7 @@ public class MyRdbVisitor implements RdbVisitor {
 ---
 <!-- *template: invert -->
 Redis-replicator-1.1.x
-```java
+```java  
 public interface RdbVisitor {
     Event applyString(RedisInputStream in, DB db, int version) throws IOException
     // 3.2增加了新的数据类型quick list
@@ -416,7 +416,7 @@ public interface RdbVisitor {
 ---
 <!-- *template: invert -->
 Redis-replicator-2.x.x
-```java
+```java  
 public abstract class RdbVisitor {
     public Event applyString(RedisInputStream in, DB db, int version) throws IOException {
         throw new UnsupportedOperationException("must implement this method.");
@@ -429,7 +429,7 @@ public abstract class RdbVisitor {
 ---
 <!-- *template: invert -->
 ### 依赖相关的反面例子
-```xml
+```xml  
         <dependency>
             <groupId>org.apache.zookeeper</groupId>
             <artifactId>zookeeper</artifactId>

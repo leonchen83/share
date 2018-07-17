@@ -66,7 +66,47 @@ Apache Kafka 是 一个分布式流处理平台
 
 ## 简单使用
 
+```java  
+
+nohup bin/zookeeper-server-start.sh config/zookeeper.properties & // 启动zookeeper
+
+nohup bin/kafka-server-start.sh config/server.properties & // 启动kafka
+
+bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 5 --topic test // 创建topic
+
+bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test // 创建消息
+>This is a message
+>This is another message
+
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning // 启动Consumer读取消息
+This is a message
+This is another message
+
+```
+
 ## Broker 集群
+
+```java  
+
+cp config/server.properties config/server-1.properties
+cp config/server.properties config/server-2.properties
+
+config/server-1.properties:
+    broker.id=1
+    listeners=PLAINTEXT://your ip:9093
+    log.dir=/tmp/kafka-logs-1
+ 
+config/server-2.properties:
+    broker.id=2
+    listeners=PLAINTEXT://your ip:9094
+    log.dir=/tmp/kafka-logs-2
+
+nohup bin/kafka-server-start.sh config/server-1.properties & // 启动broker1
+nohup bin/kafka-server-start.sh config/server-2.properties & // 启动broker2
+
+bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 3 --partitions 5 --topic my-replicated-topic
+
+```
 
 ## Partition
 
@@ -133,7 +173,7 @@ try (Producer<Integer, String> producer = new KafkaProducer<>(props)) {
 
 3. Consumer
 
-```java    
+```java  
 
 Properties props = new Properties();
 props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.100.125:9092");
@@ -188,3 +228,8 @@ while (true) {
 
 ## 容错
 
+## Broker 的重要配置
+
+## 运维与最佳实践
+
+## 其他主题

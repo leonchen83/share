@@ -64,11 +64,42 @@ Apache Kafka 是 一个分布式流处理平台
                    
 ```
 
+## 简单使用
+
+## Broker 集群
+
 ## Partition
 
 1. 结构  
 
-[!img](log_anatomy.png)
+![img](log_anatomy.png)
+
+2. Partition 和 replica
+
+当一个Topic有多个partition 并且topic创建时设置了`replication-factor` 时， 如下所示  
+`> bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 2 --partitions 10 --topic demo`  
+那么我们查看这个topic时会如下所示
+```java  
+
+> bin/kafka-topics.sh --describe --zookeeper localhost:2181 --topic demo
+Topic:demo      PartitionCount:10       ReplicationFactor:2     Configs:
+        Topic: demo     Partition: 0    Leader: 1       Replicas: 1,0   Isr: 1,0
+        Topic: demo     Partition: 1    Leader: 2       Replicas: 2,1   Isr: 2,1
+        Topic: demo     Partition: 2    Leader: 0       Replicas: 0,2   Isr: 0,2
+        Topic: demo     Partition: 3    Leader: 1       Replicas: 1,2   Isr: 1,2
+        Topic: demo     Partition: 4    Leader: 2       Replicas: 2,0   Isr: 2,0
+        Topic: demo     Partition: 5    Leader: 0       Replicas: 0,1   Isr: 0,1
+        Topic: demo     Partition: 6    Leader: 1       Replicas: 1,0   Isr: 1,0
+        Topic: demo     Partition: 7    Leader: 2       Replicas: 2,1   Isr: 2,1
+        Topic: demo     Partition: 8    Leader: 0       Replicas: 0,2   Isr: 0,2
+        Topic: demo     Partition: 9    Leader: 1       Replicas: 1,2   Isr: 1,2
+```
+
+* “leader”是负责给定分区所有读写操作的节点。每个节点都是随机选择的部分分区的领导者。
+* “replicas”是复制分区日志的节点列表。
+* “isr”是一组“同步”replicas（in-sync replicas），是replicas列表的子集。
+  
+ISR集合中的节点都是和 leader 保持高度一致的，只有这个集合的成员才有资格被选举为 leader，一条消息必须被这个集合所有节点读取并追加到日志中，这条消息才能视为提交。这个ISR集合发生变化会在ZooKeeper持久化，因此这个集合中的任何一个节点都有资格被选为leader。
 
 ## 示例代码
 
@@ -85,7 +116,7 @@ Apache Kafka 是 一个分布式流处理平台
 
 2. Producer
 
-```java    
+```java  
 
 Properties props = new Properties();
 props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "192.168.100.125:9092");
@@ -154,3 +185,6 @@ while (true) {
 ```
 
 ## Producer 和 Consumer的重要配置
+
+## 容错
+

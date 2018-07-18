@@ -265,7 +265,7 @@ while (true) {
 
 ## Deep dive into kafka
 
-### 日志与offset
+### 日志系统的结构与实现
 
 我们选取一台broker 1查看一下kafka的日志， 这里的日志指的是partition的持久化数据
 
@@ -283,7 +283,80 @@ __consumer_offsets-2   __consumer_offsets-29  __consumer_offsets-41  __consumer_
   
 kafka的日志系统的实现也和aeron类似， 采用内存映射文件（memory-mapped file）。由文件系统的pagecache来控制写入， 避免了在jvm内缓存数据再刷新到磁盘的潜在不一致问题。  
 
+在日志系统的实现上，吞吐量（Throughput）也是kafka实现上的一个重要考量，在用内存映射文件解决磁盘性能问题之后， 还要解决网络IO的性能和字节数组的大量拷贝。  
+kafka采用了"消息块"大量消息打包一起发送到服务端， 而不是一次只发送一条消息（类似redis的pipeline）。并使用[zero-copy](http://man7.org/linux/man-pages/man2/sendfile.2.html)将数据从 pagecache 转移到 socket 网络连接中。
+  
+传统的非zero-copy采用如下过程：  
+  
+1. 操作系统从磁盘读取数据到内核空间的 pagecache
+2. 应用程序读取内核空间的数据到用户空间的缓冲区
+3. 应用程序将数据(用户空间的缓冲区)写回内核空间到套接字缓冲区(内核空间)
+4. 操作系统将数据从套接字缓冲区(内核空间)复制到通过网络发送的 NIC 缓冲区
+  
+
 ### Message delivery semantic
+
+三种delivery语义
+1. At most once
+2. At least once
+3. Exactly once
+
+#### Producer角度看三种语义
+在Producer端， 参数acks与retries来实现这三种语义
+
+1. `acks=0` producer不等待服务器的返回， 视为提交成功，并且`retries`参数不生效， 等同于`At most once`语义
+2. `acks=1` producer提交到leader并且leader返回结果就视为提交成功， 不等待leader提交到follower的结果。如果提交到leader失败，producer会根据`retries`参数重试，等同于`At least once`
+3. `acks=-1` producer等待leader以及leader提交数据到`min.insync.replicas` 个 follower 成功视为提交成功，如果失败的话会根据`retries`参数重试， **这种情况并不等同于`Exactly once`**
+  
+幂等性Exactly once配置  
+  
+```java  
+
+acks=-1 
+retries > 0(最好MAX_INT)
+enable.idempotence=true //幂等性参数， 给producer分配PID和Sequence Number保证不会重复
+max.in.flight.requests.per.connection=1 // producer端允许出现未确认请求的最大数量
+
+```
+
+#### Consumer角度看三种语义
+
+1. Consumer读取到消息之后，先进行offset提交，然后再处理消息，如果消息处理到一半失败了，那这条消息就再也不会被消费了，这对应于`At most once`的语义。
+2. Consumer读取到消息之后，先处理消息，最后再offset提交。这样如果处理消息成功，在offset提交之前服务崩溃了，那么重启之后这条消息会再次被消费到，这对应于`At least once`的语义。
+3. `Exactly once` 存疑
+
+#### Kafka事务消息
+
+```java  
+// producer 端
+props...
+props.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "your_transactional.id"); // 指定事务id
+try (Producer<Integer, String> producer = new KafkaProducer<>(props)) {
+    producer.initTransactions();
+    try {
+        producer.beginTransaction();
+        for (int i = 0; i < 10; i++) {
+            producer.send(new ProducerRecord<>("demo", i, "value" + i)).get();
+        }
+        producer.commitTransaction();
+    } catch (KafkaException e) {
+        producer.abortTransaction();
+    }
+}
+
+
+// consumer 端
+props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed"); // 读已提交
+try (Consumer<Integer, String> consumer = new KafkaConsumer<>(props)) {
+    ....
+}
+
+// 事务隔离级别
+read_committed 与 read_uncommitted
+```
+
+#### Kafka事务消息原理
+
 
 ### Producer 和 Consumer的重要配置
 

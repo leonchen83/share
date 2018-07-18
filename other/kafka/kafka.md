@@ -279,7 +279,7 @@ __consumer_offsets-2   __consumer_offsets-29  __consumer_offsets-41  __consumer_
 
 ```
 
-这里的`__consumer_offsets`是kafka的隐式topic， 记录各个Consumer的提交的offset。 后面的数字后缀表示是第几个partition，我们可以看到`demo`这个topic的0,1,3,5,6,7,9 这些个partition分布在broker1中， 这些partition有些是header, 有些是follower。每个目录下面又以每100mb的大小再进行文件分割。
+这里的`__consumer_offsets`是kafka的隐式topic， 记录各个Consumer的提交的offset。 后面的数字后缀表示是第几个partition，我们可以看到`demo`这个topic的0,1,3,5,6,7,9 这些个partition分布在broker1中， 这些partition有些是header, 有些是follower。每个目录下面又以每1GB的大小再进行文件分割。
   
 kafka的日志系统的实现也和aeron类似， 采用内存映射文件（memory-mapped file）。由文件系统的pagecache来控制写入， 避免了在jvm内缓存数据再刷新到磁盘的潜在不一致问题。  
 
@@ -293,6 +293,21 @@ kafka采用了"消息块"大量消息打包一起发送到服务端， 而不是
 3. 应用程序将数据(用户空间的缓冲区)写回内核空间到套接字缓冲区(内核空间)
 4. 操作系统将数据从套接字缓冲区(内核空间)复制到通过网络发送的 NIC 缓冲区
   
+### 日志压缩
+
+可以保留相同key值的最后一条记录， 删除履历  
+压缩操作通过在后台周期性的拷贝日志段来完成。 清除操作不会阻塞读取，并且可以被配置不超过一定IO吞吐来避免影响Producer和Consumer
+
+![img](log_compaction.png)
+  
+日志压缩的配置  
+
+```java  
+log.cleanup.policy=compact
+log.cleaner.min.compaction.lag.ms // 保证消息在配置的时长内不被压缩, 不配置除了最后一个日志都压缩
+
+// 活动的segment 不压缩
+```
 
 ### Message delivery semantic
 
@@ -371,12 +386,88 @@ read_committed 与 read_uncommitted
 
 ![img](trans7.png)
 
-### Producer 和 Consumer的重要配置
+### Producer 的重要配置
+
+acks
+compression
+batch size
+
+### Consumer 的重要配置
+
+fetch size
 
 ### Broker 的重要配置
 
 ### 容错
 
+### zookeeper元数据
+
+```java  
+
+// broker关机 结点消失
+/brokers/ids/[0...N] --> {"jmx_port":...,"timestamp":...,"endpoints":[...],"host":...,"version":...,"port":...} (ephemeral node) 
+
+// topic 注册
+/brokers/topics/[topic]/partitions/[0...N]/state --> {"controller_epoch":...,"leader":...,"version":...,"leader_epoch":...,"isr":[...]} (ephemeral node)
+
+// consumer 注册 consumer消失 节点消失
+/consumers/[group_id]/ids/[consumer_id] --> {"version":...,"subscription":{...:...},"pattern":...,"timestamp":...} (ephemeral node)
+
+// partition被哪个Consumer消费信息注册 
+/consumers/[group_id]/owners/[topic]/[partition_id] --> consumer_node_id (ephemeral node)
+
+// cluster id
+/cluster/id
+```
 
 ### 运维与最佳实践
 
+```java  
+
+// 创建topic
+bin/kafka-topics.sh --zookeeper zk_host:port/chroot --create --topic my_topic_name --partitions 20 --replication-factor 3
+
+// 添加分区， 不自动重平衡分区数据
+bin/kafka-topics.sh --zookeeper zk_host:port/chroot --alter --topic my_topic_name --partitions 40
+
+// 增加删除配置项
+bin/kafka-configs.sh --zookeeper zk_host:port/chroot --entity-type topics --entity-name my_topic_name --alter --add-config x=y
+bin/kafka-configs.sh --zookeeper zk_host:port/chroot --entity-type topics --entity-name my_topic_name --alter --delete-config x
+
+// 删除topic 不支持减少分区
+bin/kafka-topics.sh --zookeeper zk_host:port/chroot --delete --topic my_topic_name
+
+// 重平衡Leader partition
+auto.leader.rebalance.enable=true
+leader.imbalance.check.interval.seconds
+bin/kafka-preferred-replica-election.sh --zookeeper host:port
+
+// graceful shutdown
+非 kill -9 杀死broker进程。 那么会同步日志到磁盘再关闭， 避免了重启时进行日志CRC验证的工作
+如果设置了
+controlled.shutdown.enable=true
+在关闭时还会进行leader 迁移
+
+// 集群间镜像数据
+bin/kafka-mirror-maker.sh --consumer.config consumer.properties --producer.config producer.properties --whitelist my-topic
+结合auto.create.topics.enable = true 可以创建副本集群
+
+// 查看consumer消费位置
+bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group
+TOPIC                          PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG        CONSUMER-ID                                       HOST                           CLIENT-ID
+my-topic                       0          2               4               2          consumer-1-029af89c-873c-4751-a720-cefd41a669d6   /127.0.0.1                     consumer-1
+my-topic                       1          2               3               1          consumer-1-029af89c-873c-4751-a720-cefd41a669d6   /127.0.0.1                     consumer-1
+my-topic                       2          2               3               1          consumer-2-42c1abd4-e3b2-425d-a8bb-e1ea49b29bb2   /127.0.0.1                     consumer-2
+
+// 管理consumer 组
+bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+test-consumer-group
+bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group test-consumer-group
+TOPIC                          PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG        CONSUMER-ID                                       HOST                           CLIENT-ID
+test-foo                       0          1               3               2          consumer-1-a5d61779-4d04-4c50-a6d6-fb35d942642d   /127.0.0.1                     consumer-1
+
+```
+
+### 分区重分配
+
+[Expanding your cluster](http://kafka.apache.org/documentation.html#basic_ops_cluster_expansion)

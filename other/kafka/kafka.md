@@ -471,3 +471,10 @@ test-foo                       0          1               3               2     
 ### 分区重分配
 
 [Expanding your cluster](http://kafka.apache.org/documentation.html#basic_ops_cluster_expansion)
+
+相关引用
+
+* [kafka documentation](http://kafka.apache.org/documentation.html)
+* [kafka 中文文档](http://kafka.apachecn.org/documentation.html)
+* [exactlyonce-semantics-in-apache-kafka](https://www.slideshare.net/ConfluentInc/exactlyonce-semantics-in-apache-kafka)
+* [transactions-apache-kafka](https://www.confluent.io/blog/transactions-apache-kafka/)

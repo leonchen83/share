@@ -357,6 +357,19 @@ read_committed 与 read_uncommitted
 
 #### Kafka事务消息原理
 
+![img](trans1.png)
+
+![img](trans2.png)
+
+![img](trans3.png)
+
+![img](trans4.png)
+
+![img](trans5.png)
+
+![img](trans6.png)
+
+![img](trans7.png)
 
 ### Producer 和 Consumer的重要配置
 
@@ -367,4 +380,3 @@ read_committed 与 read_uncommitted
 
 ### 运维与最佳实践
 
-## 其他主题

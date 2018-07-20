@@ -388,15 +388,77 @@ read_committed 与 read_uncommitted
 
 ### Producer 的重要配置
 
-acks
-compression
-batch size
+|  参数  |  默认值  | 含义 |
+|-------|----------|------|
+|bootstrap.servers | 无 | 通过配置找到broker集群|
+|key.serializer| 无 | key序列化| 
+|value.serializer| 无 | value 序列化 |
+|acks | 1 | 配置同步日志的返回消息 |
+|retries | 0 | 配置当acks!=0 时的重试次数|
+|batch.size | 16384 | 每个batch 对应一个partition的消息 |
+|compression.type | none | 指定消息压缩格式 none, gzip, snappy, lz4|
+|partitioner.class| DefaultPartitioner | 指定计算分区的类 | 
+|max.in.flight.requests.per.connection| 5 | 未确认请求的最大数量 | 
+|enable.idempotence | false | 设置producer消息幂等 |
+|transaction.id| null | 事务id |
 
 ### Consumer 的重要配置
 
-fetch size
+|  参数  |  默认值  | 含义 |
+|-------|----------|------|
+|bootstrap.servers | 无 | 通过配置找到broker集群|
+|key.deserializer| 无 | key反序列化| 
+|value.deserializer| 无 | value反序列化 |
+|fetch.min.bytes| 1 | 从broker获得数据的最小字节数 | 
+|fetch.max.bytes| 52428800 | 最大获得的字节数 | 
+|group.id| "" | 消费组id | 
+|auto.offset.reset| latest | 从哪个offset开始读数据latest, earliest, none|
+|enable.auto.commit| true | 自动提交offset | 
+|auto.commit.interval.ms| 5000 | 自动提交offset间隔| 
+|max.poll.records| 500 | 一次poll最大的数据数量|
+|partition.assignment.strategy| RangeAssignor | partition分配consumer的策略
+|isolation.level | read_uncommitted | 事务隔离级别 |
+
+### Topic 的重要配置
+
+```java  
+bin/kafka-topics.sh --zookeeper localhost:2181 --create --topic my-topic --partitions 1
+    --replication-factor 1 --config max.message.bytes=64000 --config flush.messages=1
+```
+
+|  参数  |  默认值  | 含义 |
+|-------|----------|------|
+|cleanup.policy| delete | 日志保留策略， delete 或 compact | 
+|compression.type| producer | 日志压缩类型uncompressed, snappy, lz4, gzip, producer|
+|retention.bytes| -1 | 当策略是delete时，达到此字节数时也清理日志， -1意味着只按时间清理 | 
+|retention.ms | 604800000 | 当策略是delete时, 日志保留的最大时间 |
+|min.compaction.lag.ms | 0 | 当策略是compact时，只有写入超过这个时间的日志才会压缩 | 
+|segment.bytes| 1073741824 | 日志文件大小 | 
+|segment.index.bytes| 10485760 | 日志索引文件大小 | 
+|segment.ms | 604800000 | 在超过这个时间后， 日志文件强制滚动 | 
+|min.insync.replicas| 1 | acks=all时响应的最小副本数量| 
+|max.message.bytes| 1000012 | max.fetch.size相关 |
+|unclean.leader.election.enable| false | 是否启用不在ISR集合中的副本可以选为领导者 | 
 
 ### Broker 的重要配置
+
+|  参数  |  默认值  | 含义 |
+|-------|----------|------|
+|zookeeper.connect| localhost:2181 | Zookeeper主机地址 | 
+|broker.id| -1 | 如果没设置，将生成一个唯一broker id|
+|listeners| null | PLAINTEXT://myhost:9092 | 
+|log.dirs| null | 保存日志位置， 没设置的话找log.dir|
+|log.dirs| 	/tmp/kafka-logs | 保存日志位置|
+|log.retention.hours| 168 | 日志删除的时间阈值| 
+|log.roll.hours | 168 | 日志段轮转时间间隔 | 
+|log.segment.bytes| 1073741824 | 日志大小| 
+|min.insync.replicas| 1 | acks=all时响应的最小副本数量| 
+|compression.type| producer | 参见topic设置 | 
+|delete.topic.enable| true | 如果关闭此配置，通过管理工具删除topic将不再生效 | 
+|auto.create.topics.enable| true | 是否允许在服务器上自动创建topic | 
+|auto.leader.rebalance.enable| 是否允许leader平衡，后台线程定期检查|
+|message.max.bytes| 1000012 | batch消息大小|
+|unclean.leader.election.enable| false | 是否启用不在ISR集合中的副本可以选为领导者 | 
 
 ### 容错
 

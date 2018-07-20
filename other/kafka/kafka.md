@@ -456,7 +456,7 @@ bin/kafka-topics.sh --zookeeper localhost:2181 --create --topic my-topic --parti
 |compression.type| producer | 参见topic设置 | 
 |delete.topic.enable| true | 如果关闭此配置，通过管理工具删除topic将不再生效 | 
 |auto.create.topics.enable| true | 是否允许在服务器上自动创建topic | 
-|auto.leader.rebalance.enable| 是否允许leader平衡，后台线程定期检查|
+|auto.leader.rebalance.enable| true |是否允许leader平衡，后台线程定期检查|
 |message.max.bytes| 1000012 | batch消息大小|
 |unclean.leader.election.enable| false | 是否启用不在ISR集合中的副本可以选为领导者 | 
 

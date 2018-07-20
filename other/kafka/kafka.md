@@ -309,6 +309,21 @@ log.cleaner.min.compaction.lag.ms // 保证消息在配置的时长内不被压�
 // 活动的segment 不压缩
 ```
 
+### 容错
+
+#### 单个broker故障
+  
+则从ISR集里选择一个节点提升为leader, kafka的leader不是基于投票选举， 而是基于ISR。
+投票的缺点是，多数的节点挂掉让你不能选择 leader。要冗余单点故障需要三份数据，并且要冗余两个故障需要五份的数据。每写5次，对磁盘空间需求是5倍， 吞吐量下降到 1/5。这可能是为什么quorum算法更常用于共享集群配置如ZooKeeper， 而不适用于原始数据存储的原因
+  
+#### 节点全部故障
+
+1. 等待一个ISR的副本重新恢复正常服务，并选择这个副本作为leader （它有极大可能拥有全部数据）。
+2. 选择第一个重新恢复正常服务的副本（不一定是 ISR 中的）作为leader。
+  
+第一种策略服务会不可用， 直到ISR副本恢复正常  
+第二种策略可以通过`unclean.leader.election.enable`开启， 默认是关闭的，但保证不了数据是同步的  
+  
 ### Message delivery semantic
 
 三种delivery语义
@@ -459,8 +474,6 @@ bin/kafka-topics.sh --zookeeper localhost:2181 --create --topic my-topic --parti
 |auto.leader.rebalance.enable| true |是否允许leader平衡，后台线程定期检查|
 |message.max.bytes| 1000012 | batch消息大小|
 |unclean.leader.election.enable| false | 是否启用不在ISR集合中的副本可以选为领导者 | 
-
-### 容错
 
 ### zookeeper元数据
 

@@ -1,27 +1,27 @@
-ǰ�ԣ�
-���ҽ���
-12�꿪�����飬 redis-replicator �Լ�redis-rdb-cli��redis��ؿ�Դ��Ŀ���ߡ�
+前言：
+自我介绍
+12年开发经验， redis-replicator 以及redis-rdb-cli等redis相关开源项目作者。
 
 1:
-��һ���ּ�Ҫ����һ��redis��ʲô�� Ӧ������Щ����
+第一部分简要介绍一下redis是什么， 应用在哪些场景
 
-�ǹ�ϵ�����ݿ⣬ �洢kv
-�ḻ�����ݽṹ�� ������redis-5.0�� redis��8�����ݽṹ��8�����ݽṹ��������100��������
-�ḻ����� ������Ϣϵͳ������룬 ����ͳ�ƣ� λ������ lua �ű�
-���ܸ�Ч�� ����memcache
-��ѡ�־û����ݣ���֤��������ʧ aof�־û� rdb�־û��� redis-4.0�Ļ�ϳ־û�
+非关系型数据库， 存储kv
+丰富的数据结构， 截至到redis-5.0， redis有8种数据结构，8种数据结构又衍生出100多种命令
+丰富的命令， 地理信息系统计算距离， 基数统计， 位操作， lua 脚本
+性能高效， 超过memcache
+可选持久化数据，保证重启不丢失 aof持久化 rdb持久化， redis-4.0的混合持久化
 
 2:
-�������� �� �����ڻ��棬 redis���棬 db���棬 ���㻺��
-�ֲ�ʽsession�� ΢���񣬹���session
-ȫ��id , Ӧ��incr decrԭ���������Լ��� ��ɱ������
-���а� Ӧ��sortedset�ṹ�� �ҵ�Top N������Ʒ�Ȳ���
+二级缓存 ， 程序内缓存， redis缓存， db缓存， 三层缓存
+分布式session， 微服务，共享session
+全局id , 应用incr decr原子性自增自减， 秒杀活动减库存
+排行榜， 应用sortedset结构， 找到Top N流行商品等操作
 
 3:
-RESPЭ��
-RESPЭ��Ӧ���ڿͻ�����server�˽����ϣ�redis���ⲿ�����ϸ�֤ÿ����һ������ ��һ��Ψһ�ķ��ؽ��
-��һ������
-set key valueʵ�ʴ��͵�����
+RESP协议
+RESP协议应用在客户端与server端交互上，redis在外部命令严格保证每发送一条请求， 有一条唯一的返回结果
+看一个例子
+set key value实际传送的内容
 `*3\r\n$3\r\nset\r\n$3\r\nkey\r\n$5\r\nvalue\r\n`
 
 4:

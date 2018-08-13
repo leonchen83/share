@@ -370,3 +370,7 @@ $length content
 - Redis-4.0.x Cluster RCmb v1
 - Redis-4.0.x aof-use-rdb-preamble
 - Redis-5.0.x Stream
+
+---
+
+# Thank you!

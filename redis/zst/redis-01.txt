@@ -1,8 +1,10 @@
-1：
+2：
 自我介绍
 12年开发经验， redis-replicator 以及redis-rdb-cli等redis相关开源项目作者。
 
-2:
+3:目录
+
+4:
 第一部分简要介绍一下redis是什么， 应用在哪些场景
 
 非关系型数据库， 存储kv
@@ -11,41 +13,125 @@
 性能高效， 超过memcache
 可选持久化数据，保证重启不丢失 aof持久化 rdb持久化， redis-4.0的混合持久化
 
-3:
+5:
 二级缓存 ， 程序内缓存， redis缓存， db缓存， 三层缓存
 分布式session， 微服务，共享session
 全局id , 应用incr decr原子性自增自减， 秒杀活动减库存
 排行榜， 应用sortedset结构， 找到Top N流行商品等操作
 
-4:
+6:
 RESP协议
 RESP协议应用在客户端与server端交互上，redis在外部命令严格保证每发送一条请求， 有一条唯一的返回结果
 看一个例子
 set key value实际传送的内容
 `*3\r\n$3\r\nset\r\n$3\r\nkey\r\n$5\r\nvalue\r\n`
 
-5:
+7:
+两种null的表示方式
+simple string和error中不能包含\r\n
+
+8:
 不可打印字符转义
 dump格式简介
 $type(1 byte) $string, version(2 bytes), checkcrc(8 bytes)
 
-6:
+9:
 pipeline如果增加吞吐量, 发送多个请求， 再取得多条结果。讲一下如何增加吞吐的
 
-7:
+10:
 returnResource与returnBrokenResource如果用的有问题的话， 很容易连接泄露造成连接暴涨
 这个方法也是早期jedis文档中建议的写法，现在仍然有很多人在误用
 
-8：
+11：
 这里面的close不会真的释放连接， 而是有一层代理，直接把连接释放回连接池。
 
-9:
+12:
 简化的看发送PSYNC 命令
 Master执行BGSAVE生成RDB
 发送RDB给slave，在这个过程之间新的命令会积压到master的backlog中，当RDB同步完之后， 会把backlog的命令发给slave, 并一直连接保持发送
 
-10:
+13:
 具体的交互过程
 master设置了密码的话， 需要用auth password命令认证
 listening-port slave把连接的端口号发送给master
 ip-address address 把连接的地址发送给master
+diskless-replication 需要 capa eof的能力
+psync2 需要capa psync2
+从头开始 repl_id ? repl_offset -1, 但是有条件的从某一位置开始
+接收binary data
+
+14:
+redis-4.0 psync2的话， 会返回+CONTINUE repl_id\r\n
+这像bulk string格式，但注意没有结尾的\r\n
+返回积压的命令
+rdb之后slave定期发送ack offset， 在集群failover的时候选择一个最好的offset升级为新的master
+维持长连接
+
+15:
+讲解一下E-BNF , 以及这是个简化的RDB的E-BNF表示
+大括号， 中括号， 以及竖线选择结构
+
+讲解一个具体的例子
+给出完整的RDB格式引用
+
+16:
+讲value type的对应关系，module这个type仅存活在redis-4.0-rc中, 一些type已经淘汰. 看前几个字符来识别类型.
+
+17:
+lzf 40个字节以上才开启压缩，
+checksum是小端存储的(little endian)
+
+18:
+dump格式的version占2字节， rdb的version占4字节， 趣事，为了兼容性， 只能用4个字节表示version了
+[8, 0] 小端存储， 实际转成version是[0, 8]也就是8
+
+19:
+diskless-replication用的不是标准的RESP
+
+发送\n维持连接
+
+psync2的基本原理
+
+redis-replicator
+实际代码演示
+
+20:
+无限同步
+秒杀减库存问题, master减了， slave没减， slave切换成master， 多减了库存.
+也会引发无限同步， 大key 集群迁移慢， 影响查询性能，导致查询积压
+
+21:
+这是redis作者正在提出的功能， 用来替换RESP2
+缺点一一介绍
+
+22:
+blob string 二进制安全, 相比RESP2少了\r字符
+
+23:
+:10<LF>与 ,10<LF>的区别 :10会解释成整形， ,10会接释成双精度浮点型
+不允许出现,.123<LF>, 也不允许科学计数法
+!21<LF>SYNTAX invalid syntax<LF> 和blob string很像
+逐字： =15<LF>txt<LF>Some string<LF> 15表示总长度， 3个固定字符表示格式， 紧跟着一个固定<LF>。
+big number, 超出2^64的number表示， 对应java的BigInteger
+
+24:
+嵌套数组
+
+25:
+map类型讲解
+
+26:
+set 类型， 无序， 唯一
+
+27:
+属性类型
+任意位置
+
+28:
+新特性简介
+module提供插件， redislabs上有很多module插件， 在配置文件开启相应的module。
+异步删除， 再另一个线程删除
+集群协议升级， 不兼容旧的集群协议， 无法滚动升级
+混合持久化格式 ，RDB+AOF
+stream 类似kafka， 有消费组的概念， 可以从某一offset消费事件， 消费完之后需要通知服务器消费完的offset
+

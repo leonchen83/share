@@ -7,6 +7,16 @@ Redis 协议解析
 ###### Created by 陈宝仪 ( [@leonchen83](https://github.com/leonchen83) )
 ---
 
+# 自我介绍
+
+- 12年一线工作经验
+- Redis-replicator作者
+- Redis-rdb-cli作者
+- Rocketmq-redis作者
+- 现任Nexop高级软件工程师
+
+---
+
 # 目录
 
 - Redis 简介
@@ -156,10 +166,10 @@ try {
 ### 3.2. 与 Master 交互
 - 发送 AUTH password
 - 发送 REPLCONF listening-port port
-- 发送 PSYNC repl_id repl_offset
 - 发送 REPLCONF ip-address address
 - 发送 REPLCONF capa eof (diskless-replication)
 - 发送 REPLCONF capa psync2
+- 发送 PSYNC repl_id repl_offset
 - 接收 Binary data
 
 ---
@@ -229,6 +239,19 @@ $length content
 ```
 8 个字节的CRC64验证
 ```
+
+---
+
+#### dump格式示例
+[0, 3, 97, 98, 99, 8, 0, 96, -127, -36, -126, -24, 107, 40, -38]
+
+
+[0]: type string
+[3]: [00000011] 长度是3
+[97, 98, 99]: abc
+[8, 0]: version = 8
+[96, -127, -36, -126, -24, 107, 40, -38]: crc64 
+
 
 ---
 ### 3.5. 同步协议的其他实现细节

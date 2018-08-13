@@ -1,8 +1,8 @@
-前言：
+1：
 自我介绍
 12年开发经验， redis-replicator 以及redis-rdb-cli等redis相关开源项目作者。
 
-1:
+2:
 第一部分简要介绍一下redis是什么， 应用在哪些场景
 
 非关系型数据库， 存储kv
@@ -11,17 +11,41 @@
 性能高效， 超过memcache
 可选持久化数据，保证重启不丢失 aof持久化 rdb持久化， redis-4.0的混合持久化
 
-2:
+3:
 二级缓存 ， 程序内缓存， redis缓存， db缓存， 三层缓存
 分布式session， 微服务，共享session
 全局id , 应用incr decr原子性自增自减， 秒杀活动减库存
 排行榜， 应用sortedset结构， 找到Top N流行商品等操作
 
-3:
+4:
 RESP协议
 RESP协议应用在客户端与server端交互上，redis在外部命令严格保证每发送一条请求， 有一条唯一的返回结果
 看一个例子
 set key value实际传送的内容
 `*3\r\n$3\r\nset\r\n$3\r\nkey\r\n$5\r\nvalue\r\n`
 
-4:
+5:
+不可打印字符转义
+dump格式简介
+$type(1 byte) $string, version(2 bytes), checkcrc(8 bytes)
+
+6:
+pipeline如果增加吞吐量, 发送多个请求， 再取得多条结果。讲一下如何增加吞吐的
+
+7:
+returnResource与returnBrokenResource如果用的有问题的话， 很容易连接泄露造成连接暴涨
+这个方法也是早期jedis文档中建议的写法，现在仍然有很多人在误用
+
+8：
+这里面的close不会真的释放连接， 而是有一层代理，直接把连接释放回连接池。
+
+9:
+简化的看发送PSYNC 命令
+Master执行BGSAVE生成RDB
+发送RDB给slave，在这个过程之间新的命令会积压到master的backlog中，当RDB同步完之后， 会把backlog的命令发给slave, 并一直连接保持发送
+
+10:
+具体的交互过程
+master设置了密码的话， 需要用auth password命令认证
+listening-port slave把连接的端口号发送给master
+ip-address address 把连接的地址发送给master

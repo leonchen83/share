@@ -299,5 +299,3 @@ while (true) {
 
 ![consumer](./consumer.png)
 
-![reader](./reader.png)
-

@@ -299,3 +299,54 @@ while (true) {
 
 ![consumer](./consumer.png)
 
+#### Schema
+
+```java  
+
+Producer<byte[]> bytesProducer = client.newProducer()
+      .topic("some-raw-bytes-topic")
+      .create();
+// 等同于
+Producer<byte[]> bytesProducer = client.newProducer(Schema.BYTES)
+      .topic("some-raw-bytes-topic")
+      .create();
+      
+public class SensorReading {
+    public float temperature;
+
+    public SensorReading() {
+    }
+
+    public float getTemperature() {
+        return temperature;
+    }
+
+    public void setTemperature(float temperature) {
+        this.temperature = temperature;
+    }
+}
+
+Producer<SensorReading> producer = client.newProducer(JSONSchema.of(SensorReading.class))
+        .topic("sensor-readings")
+        .create();
+        
+SensorReading message = new SensorReading();
+message.setTemperature(32.5f);
+producer.send(message);
+
+```
+
+Pulsar内嵌的Schema  
+  
+* STRING
+* BYTES
+* JSON
+* Protobuf
+* Avro
+* ByteSchema.of()
+* ShortSchema.of()
+* IntSchema.of()
+* LongSchema.of()
+* FloatSchema.of()
+* DoubleSchema.of()
+

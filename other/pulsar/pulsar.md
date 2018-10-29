@@ -1,6 +1,6 @@
 # Pulsar
 
-## 简介
+# 简介
 
 1. Pulsar是pub-sub模式的分布式消息平台，拥有灵活的消息模型和直观的客户端API。
 2. Pulsar由雅虎开发并开源的下一代消息系统，目前是Apache软件基金会的项目。
@@ -8,13 +8,13 @@
   
 ![pulsar1](./pulsar1.png)
   
-## 架构
+# 架构
 
 ![arch](./arch.png)
 
-## 基本概念
+# 基本概念
 
-#### Topic, Tenant, Namespace, Partition
+## Topic, Tenant, Namespace, Partition
 
 Topic是Pulsar的核心概念，表示一个`channel`，Producer可以写入数据，Consumer从中消费数据  
 Topic名称的url类似如下的结构：  
@@ -47,7 +47,7 @@ Pulsar提供了一些策略来处理消息到Partition的路由（MessageRouter�
 不同于Kafka，Pulsar允许Consumer的数量超过分区的数量  
 在Shared subscription的订阅模式下，Consumer数量可以大于分区的数量，每个Consumer处理每个Partition中的一部分消息，不保证消息的顺序。
 
-#### 订阅模型
+## 订阅模型
   
 Pulsar提供了灵活的消息模型，支持三种订阅类型：
   
@@ -57,7 +57,7 @@ Pulsar提供了灵活的消息模型，支持三种订阅类型：
 
 ![pulsar3](./pulsar3.png)
   
-#### Broker, Bookie
+## Broker, Bookie
   
 ![pulsar5](./pulsar5.png)
   
@@ -67,20 +67,20 @@ Pulsar采用"存储和服务分离"的两层架构（这是Pulsar区别于其他
 * Bookie：提供存储能力（BookKeeper的存储组件）
 优势是Broker成为了stateless组件，可以水平扩容。高可靠，一致性等通过BookKeeper去保证。  
 
-#### Geo-replication
+## Geo-replication
   
 ![pulsar6](./pulsar6.png)
   
 上图中，Producer P1、P2、P3在不同的Cluster发送给Topic T1的消息，会在Cluster之间进行复制，Consumer C1、C2可以在自己所在的Cluster消费到所有的消息。
 当消息被写入Pulsar时，首先消息被持久化在local cluster，之后异步的发送到其他cluster。在没有链接问题的情况下，通常复制的latency相近于网络的RTT。
 
-#### Pulsar function, Pulsar IO, Pulsar SQL
+## Pulsar function, Pulsar IO, Pulsar SQL
 
-Pulsar function  
+### Pulsar function  
   
 ![pulsar7](./pulsar7.png)
 
-Pulsar IO
+### Pulsar IO
 
 ![pulsar8](./pulsar8.png)
   

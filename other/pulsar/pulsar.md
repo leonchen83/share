@@ -188,16 +188,116 @@ bin/pulsar-daemon start discovery
   
 ### 客户端编程
 
+```java  
+<dependency>
+  <groupId>org.apache.pulsar</groupId>
+  <artifactId>pulsar-client</artifactId>
+  <version>2.2.0</version>
+</dependency>
+```
+
 #### Producer
 
-```java
+```java  
 
+PulsarClient client = PulsarClient.builder()
+        .serviceUrl("pulsar://pulsar.example.com:6650").build();
+Producer<byte[]> producer = client.newProducer()
+        .topic("my-topic") // persistent://public/default/my-topic
+        .batchingMaxPublishDelay(10, TimeUnit.MILLISECONDS) // optional
+        .sendTimeout(10, TimeUnit.SECONDS) // optional
+        .blockIfQueueFull(true) // optional
+        .create();
 
+producer.send("My message".getBytes());
+// producer.sendAsync("My message".getBytes());
 
+// send messages with properties.
+producer.newMessage()
+    .key("my-message-key")
+    .value("my-async-message".getBytes())
+    .property("my-key", "my-value")
+    .property("my-other-key", "my-other-value")
+    .send();
+
+// close
+producer.close();
+client.close();
+
+// async close
+// producer.closeAsync();
+// client.closeAsync();
 
 ```
 
 #### Consumer
 
+```java  
+
+PulsarClient client = PulsarClient.builder()
+        .serviceUrl("pulsar://pulsar.example.com:6650").build();
+Consumer consumer = client.newConsumer()
+        .topic("my-topic")
+        .subscriptionName("my-subscription")
+        .ackTimeout(10, TimeUnit.SECONDS)
+        .subscriptionType(SubscriptionType.Exclusive)
+        .subscribe();
+        
+while (true) {
+    Message msg = consumer.receive();
+    System.out.printf("Message received: %s", new String(msg.getData()));
+    consumer.acknowledge(msg);
+} 
+
+
+// async receive
+CompletableFuture<Message> asyncMessage = consumer.receiveAsync();
+
+```
+  
+订阅多个topics  
+  
+```java  
+PulsarClient client = PulsarClient.builder()
+        .serviceUrl("pulsar://pulsar.example.com:6650").build();
+        
+// Pattern pattern = Pattern.compile("persistent://public/default/.*");
+Pattern pattern = Pattern.compile("persistent://public/default/foo.*");
+
+Consumer allTopicsConsumer = client.newConsumer()
+        .subscriptionName("my-subscription")
+        .topicsPattern(pattern)
+        //.topics(Arrays.asList("topic1", "topic2"))
+        .subscribe();
+
+```
 
 #### Reader
+
+```java  
+PulsarClient client = PulsarClient.builder()
+        .serviceUrl("pulsar://pulsar.example.com:6650").build();
+        
+ReaderConfiguration conf = new ReaderConfiguration();
+Reader reader = client.newReader()
+        .topic(topic)
+        .startMessageId(MessageId.fromByteArray(msgIdBytes))
+        //.startMessageId(MessageId.latest)
+        //.startMessageId(MessageId.earliest)
+        .create();
+
+while (true) {
+    Message message = reader.readNext();
+    // Process message
+}
+
+// reader不能用在partitioned topic上
+
+```
+
+#### Consumer与Reader的区别
+
+![consumer](./consumer.png)
+
+![reader](./reader.png)
+

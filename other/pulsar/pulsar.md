@@ -349,4 +349,3 @@ Pulsar内嵌的Schema
 * LongSchema.of()
 * FloatSchema.of()
 * DoubleSchema.of()
-

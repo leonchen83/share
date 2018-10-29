@@ -12,6 +12,8 @@
 
 ![arch](./arch.png)
 
+![arch1](./arch1.png)
+
 # 基本概念
 
 ## Topic, Tenant, Namespace, Partition
@@ -93,3 +95,109 @@ Pulsar采用"存储和服务分离"的两层架构（这是Pulsar区别于其他
 | Kinesis sink	|org.apache.pulsar.io.kinesis.KinesisSink |
 | RabbitMQ source	|org.apache.pulsar.io.rabbitmq.RabbitMQSource |
 | Twitter Firehose source	|org.apache.pulsar.io.twitter.TwitterFireHose |
+
+### Pulsar SQL
+
+```java  
+./bin/pulsar standalone
+./bin/pulsar sql-worker run
+./bin/pulsar sql
+
+presto> select * from pulsar."public/default".topic1;
+
+  firstname  | middlename  |  lastname   |              email               |   username   | password | telephonenumber | age |                 companyemail                  | nationalidentitycardnumber | 
+-------------+-------------+-------------+----------------------------------+--------------+----------+-----------------+-----+-----------------------------------------------+----------------------------+
+ Genesis     | Katherine   | Wiley       | genesis.wiley@gmail.com          | genesisw     | y9D2dtU3 | 959-197-1860    |  71 | genesis.wiley@interdemconsulting.eu           | 880-58-9247                |   
+ Brayden     |             | Stanton     | brayden.stanton@yahoo.com        | braydens     | ZnjmhXik | 220-027-867     |  81 | brayden.stanton@supermemo.eu                  | 604-60-7069                |   
+ Benjamin    | Julian      | Velasquez   | benjamin.velasquez@yahoo.com     | benjaminv    | 8Bc7m3eb | 298-377-0062    |  21 | benjamin.velasquez@hostesltd.biz              | 213-32-5882                |   
+ Michael     | Thomas      | Donovan     | donovan@mail.com                 | michaeld     | OqBm9MLs | 078-134-4685    |  55 | michael.donovan@memortech.eu                  | 443-30-3442                |   
+ Brooklyn    | Avery       | Roach       | brooklynroach@yahoo.com          | broach       | IxtBLafO | 387-786-2998    |  68 | brooklyn.roach@warst.biz                      | 085-88-3973                |   
+ Skylar      |             | Bradshaw    | skylarbradshaw@yahoo.com         | skylarb      | p6eC6cKy | 210-872-608     |  96 | skylar.bradshaw@flyhigh.eu                    | 453-46-0334                |    
+.
+.
+.
+
+```
+
+# 细节
+
+### 集群创建
+
+集群环境的最小要求  
+6 台 linux 机器或虚拟机  
+其中  
+3台zookeeper集群  
+3台pulsar broker与bookie  
+1台service discovery(可选)  
+
+推荐的硬件配置
+
+zookeeper略  
+Bookies & Brokers  
+高速cpu以及高速网卡(10Gbps), SSD或HDDs  
+
+```java  
+
+# zookeeper集群略
+# zk1.example.com:2181,zk2.example.com:2181,zk3.example.com:2181
+
+# pulsar
+wget https://archive.apache.org/dist/pulsar/pulsar-2.2.0/apache-pulsar-2.2.0-bin.tar.gz
+tar xvzf apache-pulsar-2.2.0-bin.tar.gz
+cd apache-pulsar-2.2.0
+
+# 写入集群的metadata到zookeeper
+bin/pulsar initialize-cluster-metadata \
+  --cluster pulsar-cluster-1 \
+  --zookeeper zk1.example.com:2181 \
+  --configuration-store zk1.example.com:2181 \
+  --web-service-url http://pulsar.example.com:8080 \
+  --web-service-url-tls https://pulsar.example.com:8443 \
+  --broker-service-url pulsar://pulsar.example.com:6650 \
+  --broker-service-url-tls pulsar+ssl://pulsar.example.com:6651
+
+# Bookie cluster
+# conf/bookkeeper.conf
+# zkServers=zk1.example.com:2181,zk2.example.com:2181,zk3.example.com:2181
+bin/pulsar-daemon start bookie
+
+# Broker cluster
+# conf/broker.conf
+# zookeeperServers=zk1.example.com:2181,zk2.example.com:2181,zk3.example.com:2181
+# configurationStoreServers=zk1.example.com:2181,zk2.example.com:2181,zk3.example.com:2181
+# clusterName=pulsar-cluster-1
+# functionsWorkerEnabled=true(可选)
+# pulsarFunctionsCluster=pulsar-cluster-1(可选)
+bin/pulsar broker
+
+# Service discovery
+# conf/discovery.conf
+# zookeeperServers=zk1.example.com:2181,zk2.example.com:2181,zk3.example.com:2181
+# configurationStoreServers=zk1.example.com:2181,zk2.example.com:2181,zk3.example.com:2181
+bin/pulsar-daemon start discovery
+
+```
+
+### Namespace创建
+
+```java
+
+
+
+```
+  
+### 客户端编程
+
+#### Producer
+
+```java
+
+
+
+
+```
+
+#### Consumer
+
+
+#### Reader

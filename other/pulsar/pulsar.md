@@ -180,9 +180,10 @@ bin/pulsar-daemon start discovery
 
 ### Namespace创建
 
-```java
+```java  
 
-
+pulsar-admin tenants create -c standalone nextop
+pulsar-admin namespaces create -c standalone nextop/gondor
 
 ```
   

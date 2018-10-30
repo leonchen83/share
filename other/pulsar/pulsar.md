@@ -182,8 +182,8 @@ bin/pulsar-daemon start discovery
 
 ```java  
 
-pulsar-admin tenants create -c standalone nextop
-pulsar-admin namespaces create -c standalone nextop/gondor
+bin/pulsar-admin tenants create -c pulsar-cluster-1 nextop
+bin/pulsar-admin namespaces create -c pulsar-cluster-1 nextop/gondor
 
 ```
   
@@ -248,6 +248,7 @@ while (true) {
     Message msg = consumer.receive();
     System.out.printf("Message received: %s", new String(msg.getData()));
     consumer.acknowledge(msg);
+    // consumer.acknowledgeCumulative(message); // cumulative acknowledge
 } 
 
 
@@ -350,3 +351,44 @@ Pulsar内嵌的Schema
 * LongSchema.of()
 * FloatSchema.of()
 * DoubleSchema.of()
+
+### 订阅模型
+
+```java  
+
+// default
+client.newConsumer().topic("test")
+    .subscriptionName("name").subscriptionType(SubscriptionType.Exclusive).subscribe(); 
+    
+    
+client.newConsumer().topic("test")
+    .subscriptionName("name").subscriptionType(SubscriptionType.Shared).subscribe();
+    
+client.newConsumer().topic("test")
+    .subscriptionName("name").subscriptionType(SubscriptionType.Failover).subscribe();
+
+```
+
+#### Exclusive Mode
+
+![pub-sub1](./pub-sub1.png)
+
+#### Shared
+
+![pub-sub2](./pub-sub2.png)
+
+* 不保证消息顺序, 不能使用`cumulative acknowledgment`
+
+#### Failover
+
+![pub-sub3](./pub-sub3.png)
+
+* 按照`consumerName("consumer-name-1")`的字典序, 第一个consumer接受消息, 其他为slave的consumer, master断开后, 所有master未ack的消息都会被slave再次消费.
+
+#### 多主题订阅的一些限制
+
+1. 多主题订阅必须在相同的namespace下
+2. 多主题订阅不保证消息顺序
+3. 多主题订阅如果一个topic不存在时, 那么会在topic创建时自动订阅此topic
+
+ 

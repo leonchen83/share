@@ -391,4 +391,37 @@ client.newConsumer().topic("test")
 2. 多主题订阅不保证消息顺序
 3. 多主题订阅如果一个topic不存在时, 那么会在topic创建时自动订阅此topic
 
- 
+### 消息
+
+#### 保留与过期
+  
+默认的策略  
+
+1. 立即删除已经acknowledgment的消息
+2. 持久化保存所有未acknowledgment的消息
+  
+消息保留(retention) 可以额外存储一个已经acknowledgment的消息一段时间, 消息过期(expiry) 允许给一个未acknowledgment设置一个TTL. 保留与过期是在namespace级别上设置  
+  
+![retention](./retention-expiry.png)
+  
+设置保留策略  
+  
+```java  
+bin/pulsar-admin namespaces set-retention nextop/gondor --size 10G --time 3h
+bin/pulsar-admin namespaces set-retention nextop/gondor --size 1T --time -1
+bin/pulsar-admin namespaces set-retention nextop/gondor --size -1 --time -1
+
+```
+  
+设置过期策略  
+  
+```java  
+# TTL of 2 minutes
+bin/pulsar-admin namespaces set-message-ttl nextop/gondor --messageTTL 120 
+
+```
+  
+#### 消息去重
+
+![deduplication](./message-deduplication.png)
+  

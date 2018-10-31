@@ -480,6 +480,8 @@ bin/pulsar-admin topics create-partitioned-topic persistent://nextop/gondor/topi
 
 ![cursor2](./cursor2.png)
 
+### 存储
+
 # References
 
 * [Effectively-once semantics in Apache Pulsar](https://streaml.io/blog/pulsar-effectively-once)

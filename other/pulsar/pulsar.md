@@ -425,3 +425,38 @@ bin/pulsar-admin namespaces set-message-ttl nextop/gondor --messageTTL 120
 
 ![deduplication](./message-deduplication.png)
   
+```java  
+
+配置conf/broker.conf
+brokerDeduplicationEnabled=true
+
+bin/pulsar-admin namespaces set-deduplication nextop/gondor --enable
+bin/pulsar-admin namespaces set-deduplication nextop/gondor --disable
+
+客户端需要设置producer name以及设置sendTimeout(0, TimeUnit.SECONDS);
+
+```
+
+#### 消息语义
+
+1. At-most-once
+
+2. At-least-once
+
+3. Exactly-once(At-least-once + Message deduplication)
+
+#### Topic压缩
+
+```java  
+# 自动
+bin/pulsar-admin namespaces set-compaction-threshold --threshold 100M nextop/gondor
+
+# 手动
+bin/pulsar compact-topic --topic persistent://nextop/gondor/my-topic
+
+```
+
+# References
+
+* [Effectively-once semantics in Apache Pulsar](https://streaml.io/blog/pulsar-effectively-once)
+* [Exactly once is NOT exactly the same](https://streaml.io/blog/exactly-once)

@@ -456,7 +456,35 @@ bin/pulsar compact-topic --topic persistent://nextop/gondor/my-topic
 
 ```
 
+#### Non-persistent消息
+
+```java  
+non-persistent://nextop/gondor/topic
+
+#conf/broker.conf
+enableNonPersistentTopics=true
+enablePersistentTopics=true
+
+```
+
+#### Partitioned topics
+
+```java  
+bin/pulsar-admin topics create-partitioned-topic persistent://nextop/gondor/topic --partitions 4
+
+```
+
+#### Cursors in Pulsar
+
+![cursor1](./cursor1.png)
+
+![cursor2](./cursor2.png)
+
 # References
 
 * [Effectively-once semantics in Apache Pulsar](https://streaml.io/blog/pulsar-effectively-once)
 * [Exactly once is NOT exactly the same](https://streaml.io/blog/exactly-once)
+* [Introduction to Apache BookKeeper](https://streaml.io/blog/intro-to-bookkeeper)
+* [Why Apache BookKeeper? Part 1](https://streaml.io/blog/why-apache-bookkeeper)
+* [Why Apache Bookkeeper? Part 2](https://streaml.io/blog/why-bookkeeper-part-2)
+* [Cursors in Apache Pulsar](https://streaml.io/blog/cursors-in-pulsar)

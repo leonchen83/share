@@ -395,11 +395,6 @@ client.newConsumer().topic("test")
 
 #### 保留与过期
   
-默认的策略  
-
-1. 立即删除已经acknowledgment的消息
-2. 持久化保存所有未acknowledgment的消息
-  
 消息保留(retention) 可以额外存储一个已经acknowledgment的消息一段时间, 消息过期(expiry) 允许给一个未acknowledgment设置一个TTL. 保留与过期是在namespace级别上设置  
   
 ![retention](./retention-expiry.png)
@@ -482,8 +477,31 @@ bin/pulsar-admin topics create-partitioned-topic persistent://nextop/gondor/topi
 
 ### 存储
 
+#### 存储概览
+
+* broker无状态, metadata存储在zookeeper中
+
+![pulsar-bookkeeper-cluster](./pulsar-bookkeeper-cluster.png)
+
+#### Broker failover and expansion
+
+![pulsar-broker-failure](./pulsar-broker-failure.png)
+  
+* 扩展broker不需要数据再平衡
+
+#### Bookie failover and expansion
+  
+![pulsar-bookie-failure](pulsar-bookie-failure.png)
+  
+* bookie如果有failure的话需要数据再平衡
+  
+![pulsar-cluster-expansion](./pulsar-cluster-expansion.png)
+  
+* 扩展bookie的话有可能保存的segment数量不均衡
+  
 # References
 
+* [Comparing Pulsar and Kafka: how a segment-based architecture delivers better performance, scalability, and resilience](https://streaml.io/blog/pulsar-segment-based-architecture)
 * [Effectively-once semantics in Apache Pulsar](https://streaml.io/blog/pulsar-effectively-once)
 * [Exactly once is NOT exactly the same](https://streaml.io/blog/exactly-once)
 * [Introduction to Apache BookKeeper](https://streaml.io/blog/intro-to-bookkeeper)

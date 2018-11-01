@@ -554,6 +554,16 @@ bin/pulsar-admin topics create-partitioned-topic persistent://nextop/gondor/topi
 ![pulsar-cluster-expansion](./pulsar-cluster-expansion.png)
   
 * 扩展bookie的话有可能保存的segment数量不均衡
+
+## 未涉及到的其他主题
+
+[Authentication](https://pulsar.apache.org/docs/en/security-tls-authentication/)
+[Geo-replication](https://pulsar.apache.org/docs/en/administration-geo/)
+[pulsar-IO](https://pulsar.apache.org/docs/en/io-quickstart/)
+[pulsar-functions](https://pulsar.apache.org/docs/en/functions-quickstart/)
+[pulsar-SQL](https://pulsar.apache.org/docs/en/sql-getting-started/)
+[pulsar-dashboard](https://pulsar.apache.org/docs/en/administration-dashboard/)
+[pulsar configuration](https://pulsar.apache.org/docs/en/reference-configuration/)
   
 # References
 

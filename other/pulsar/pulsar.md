@@ -119,6 +119,62 @@ presto> select * from pulsar."public/default".topic1;
 
 ```
 
+对于嵌套结构的schema
+
+```java  
+
+public static class Test {
+        private String name;
+        private Profile profile;
+        public String getName() {
+            return name;
+        }
+        public void setName(String name) {
+            this.name = name;
+        }
+        public Profile getProfile() {
+            return profile;
+        }
+        public void setProfile(Profile profile) {
+            this.profile = profile;
+        }
+    }
+    
+    public static class Profile {
+        private int age;
+        private String address;
+        public int getAge() {
+            return age;
+        }
+        public void setAge(int age) {
+            this.age = age;
+        }
+        public String getAddress() {
+            return address;
+        }
+        public void setAddress(String address) {
+            this.address = address;
+        }
+    }
+```
+
+```java  
+  name   | profile.age | profile.address | __event_time__ |      __publish_time__       | __message_id__ | __sequence_id__ | __producer_name
+---------+-------------+-----------------+----------------+-----------------------------+----------------+-----------------+----------------
+ name100 |         100 | address100      | NULL           | 2018-11-01 07:13:32.645 UTC | 1219:100:-1:0  |             100 | producer-demo
+ name101 |         101 | address101      | NULL           | 2018-11-01 07:13:32.650 UTC | 1219:101:-1:0  |             101 | producer-demo
+ name102 |         102 | address102      | NULL           | 2018-11-01 07:13:32.654 UTC | 1219:102:-1:0  |             102 | producer-demo
+ name103 |         103 | address103      | NULL           | 2018-11-01 07:13:32.658 UTC | 1219:103:-1:0  |             103 | producer-demo
+ name104 |         104 | address104      | NULL           | 2018-11-01 07:13:32.662 UTC | 1219:104:-1:0  |             104 | producer-demo
+ name105 |         105 | address105      | NULL           | 2018-11-01 07:13:32.666 UTC | 1219:105:-1:0  |             105 | producer-demo
+ name106 |         106 | address106      | NULL           | 2018-11-01 07:13:32.677 UTC | 1219:106:-1:0  |             106 | producer-demo
+ name107 |         107 | address107      | NULL           | 2018-11-01 07:13:32.681 UTC | 1219:107:-1:0  |             107 | producer-demo
+ name108 |         108 | address108      | NULL           | 2018-11-01 07:13:32.685 UTC | 1219:108:-1:0  |             108 | producer-demo
+ name109 |         109 | address109      | NULL           | 2018-11-01 07:13:32.689 UTC | 1219:109:-1:0  |             109 | producer-demo
+ name110 |         110 | address110      | NULL           | 2018-11-01 07:13:32.695 UTC | 1219:110:-1:0  |             110 | producer-demo
+
+```
+
 # 细节
 
 ### 集群创建

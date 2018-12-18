@@ -98,7 +98,7 @@ jetcd是etcd的官方java客户端, 实现了etcd的gRPC的API, 与etcd-server�
 2. 发送LockRequest 并设置第一步申请的leaseId以及要lock的资源, 向服务器发送lock请求. LockRequest(resource, leaseId) -> LockResponse(key)
 3. 如果第二步成功, 那么返回一个key, 说明锁住了相应的资源,跳转到步骤4 如果第二步超时, 说明这个资源正在被其他的锁锁住, 跳转到步骤5
 4. 如果已经获得了锁, 那么定期发送LeaseKeepAliveRequest(leaseId), 维持这个锁的获得时间, 如果这个请求发送失败, 那么在ttl的时间后释放锁, 跳转到步骤1
-5. 如果这个资源被其他的资源锁住, 那么发送LeaseRevokeRequest(leaseId) 请求, 撤销掉申请的租期, 然后定期 间隔固定时间跳转到步骤1
+5. 如果这个资源被其他的资源锁住, 那么发送LeaseRevokeRequest(leaseId) 请求, 撤销掉申请的租期, 然后定期跳转到步骤1
 
 ### Unlock步骤
 

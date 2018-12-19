@@ -106,7 +106,7 @@ jetcd是etcd的官方java客户端, 实现了etcd的gRPC的API, 与etcd-server�
 
 ### 实现的一些细节
 
-* 一个实现 gondor工程下的EtcdNamedLocker
+* gondor工程下的EtcdNamedLocker
 * ttl
 * retries
 * heartbeat interval

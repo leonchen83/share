@@ -117,18 +117,24 @@ ttl = 8000
 retries = 3
 heartbeat interval = 2000
 
-get lock |-----------ttl-------------|
-         |--2s--|retry1|--2s--|retry2|--2s--|retry3| release lock
-         |---------------------------|其他模块在此时获得了锁
+get lock |-----------ttl-------------|                                <---main thread 
+         |--2s--|retry1|--2s--|retry2|--2s--|retry3| release lock     <---heartbeat thread
+         
+         
+         |---------------------------|其他模块在此时获得了锁。           <---other module main thread
          
 一个正确的配置
 ttl = 8000
 retries = 3
 heartbeat interval = 1000
 
-get lock |-------------------------ttl---------------------------|
-         |--1s--|retry1|--1s--|retry2|--1s--|retry3|release lock
-         |-------------------------------------------------------|其他模块在此时获得了锁
+
+
+get lock |-------------------------ttl---------------------------|                         <---main thread 
+         |--1s--|retry1|--1s--|retry2|--1s--|retry3|release lock                           <---heartbeat thread
+         
+         
+         |-------------------------------------------------------|其他模块在此时获得了锁。    <---other module main thread
 ```
 
 ## etcd 集群服务发现

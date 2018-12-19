@@ -8,7 +8,7 @@ etcd是高可用的分布式键值(key-value)数据库, 由go语言实现, etcd�
 ### CAP
 * 强一致性(Consistency)
 * 可用性(Availability)
-* 分区容错性(Partition Tolerance)
+* 部分容错性(Partition Tolerance)
   
 etcd 与 zookeeper 都满足其中的CP  
 

@@ -82,7 +82,7 @@ sudo chown rabbitmq:rabbitmq /var/lib/rabbitmq/*
 # 在主节点之外的其他节点执行以下命令
 sudo rabbitmqctl stop_app
 sudo rabbitmqctl reset
-sudo rabbitmqctl join_cluster rabbitmq-241@btc-dev-1 --ram
+sudo rabbitmqctl join_cluster rabbitmq-241@btc-dev-1 
 sudo rabbitmqctl start_app
 
 # 在任意节点执行
@@ -90,7 +90,7 @@ sudo rabbitmqctl cluster_status
 可以看到如下信息
 
 Cluster status of node rabbitmq-242@btc-dev-2 ...
-[{nodes,[{disc,['rabbitmq-241@btc-dev-1']},{ram,['rabbitmq-242@btc-dev-2']}]},
+[{nodes,[{disc,['rabbitmq-241@btc-dev-1','rabbitmq-242@btc-dev-2']}]},
  {running_nodes,['rabbitmq-241@btc-dev-1','rabbitmq-242@btc-dev-2']},
  {cluster_name,<<"rabbitmq-242@btc-dev-2">>},
  {partitions,[]},

@@ -162,6 +162,13 @@ connection.addBlockedListener(new BlockedListener() {
 ## 内存 & 持久化
 
 ## 服务端流控参数
+ 
+```java  
+
+sudo rabbitmqctl set_vm_memory_high_watermark <fraction>
+sudo rabbitmqctl set_vm_memory_high_watermark absolute <value>
+
+```
 
 ## Producer confirms & Consumer ack
 

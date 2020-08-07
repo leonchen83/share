@@ -57,9 +57,213 @@ OS name: "windows 7", version: "6.1", arch: "amd64", family: "windows"
 
 ```
 
-利用jdk12的jdeps检测依赖了哪些内部包， `$project`代表你自己工程编译好的jar包
+利用jdk12+的jdeps检测依赖了哪些内部包（jdk11的jdeps有bug）， `$project`代表你自己工程编译好的jar包
 ```java  
-jdeps --jdk-internals -R --class-path 'libs/*' $project
+jdeps --multi-release 11 --jdk-internals -R --class-path 'libs/*' $project
+```
+
+结果类似如下 
+
+```java  
+$ jdeps  --multi-release 11 --jdk-internals -R --class-path './dep/*' ./lib/*.jar
+Warning: split package: javax.xml.parsers jrt:/java.xml ./dep/xml-apis-1.0.b2.jar
+Warning: split package: javax.xml.transform jrt:/java.xml ./dep/xml-apis-1.0.b2.jar
+Warning: split package: javax.xml.transform.dom jrt:/java.xml ./dep/xml-apis-1.0.b2.jar
+Warning: split package: javax.xml.transform.sax jrt:/java.xml ./dep/xml-apis-1.0.b2.jar
+Warning: split package: javax.xml.transform.stream jrt:/java.xml ./dep/xml-apis-1.0.b2.jar
+Warning: split package: org.w3c.dom jrt:/java.xml ./dep/xml-apis-1.0.b2.jar
+Warning: split package: org.w3c.dom.css jrt:/jdk.xml.dom ./dep/xml-apis-1.0.b2.jar
+Warning: split package: org.w3c.dom.events jrt:/java.xml ./dep/xml-apis-1.0.b2.jar
+Warning: split package: org.w3c.dom.html jrt:/jdk.xml.dom ./dep/xml-apis-1.0.b2.jar
+Warning: split package: org.w3c.dom.ranges jrt:/java.xml ./dep/xml-apis-1.0.b2.jar
+Warning: split package: org.w3c.dom.stylesheets jrt:/jdk.xml.dom ./dep/xml-apis-1.0.b2.jar
+Warning: split package: org.w3c.dom.traversal jrt:/java.xml ./dep/xml-apis-1.0.b2.jar
+Warning: split package: org.w3c.dom.views jrt:/java.xml ./dep/xml-apis-1.0.b2.jar
+Warning: split package: org.xml.sax jrt:/java.xml ./dep/xml-apis-1.0.b2.jar
+Warning: split package: org.xml.sax.ext jrt:/java.xml ./dep/xml-apis-1.0.b2.jar
+Warning: split package: org.xml.sax.helpers jrt:/java.xml ./dep/xml-apis-1.0.b2.jar
+aeron-all-1.21.2.jar -> jdk.unsupported
+   io.aeron.driver.PublicationImage                   -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.aeron.driver.buffer.MappedRawLog                -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.aeron.logbuffer.ExclusiveTermAppender           -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.aeron.logbuffer.HeaderWriter                    -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.aeron.logbuffer.NativeBigEndianHeaderWriter     -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.aeron.logbuffer.TermAppender                    -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.aeron.samples.EmbeddedBufferClaimIpcThroughput$Subscriber -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.aeron.samples.EmbeddedExclusiveBufferClaimIpcThroughput$Subscriber -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.aeron.samples.EmbeddedExclusiveIpcThroughput$Subscriber -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.aeron.samples.EmbeddedExclusiveVectoredIpcThroughput$Subscriber -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.aeron.samples.EmbeddedIpcThroughput$Subscriber  -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.aeron.status.ReadableCounter                    -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   org.agrona.BufferUtil                              -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   org.agrona.ExpandableArrayBuffer                   -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   org.agrona.ExpandableDirectByteBuffer              -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   org.agrona.UnsafeAccess                            -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   org.agrona.concurrent.AbstractConcurrentArrayQueue -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   org.agrona.concurrent.ManyToManyConcurrentArrayQueue -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   org.agrona.concurrent.ManyToOneConcurrentArrayQueue -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   org.agrona.concurrent.ManyToOneConcurrentLinkedQueue -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   org.agrona.concurrent.ManyToOneConcurrentLinkedQueuePadding1 -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   org.agrona.concurrent.ManyToOneConcurrentLinkedQueuePadding1$Node -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   org.agrona.concurrent.MappedResizeableBuffer       -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   org.agrona.concurrent.OneToOneConcurrentArrayQueue -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   org.agrona.concurrent.ShutdownSignalBarrier        -> sun.misc.Signal                                    JDK internal API (jdk.unsupported)
+   org.agrona.concurrent.ShutdownSignalBarrier        -> sun.misc.SignalHandler                             JDK internal API (jdk.unsupported)
+   org.agrona.concurrent.SigInt                       -> sun.misc.Signal                                    JDK internal API (jdk.unsupported)
+   org.agrona.concurrent.SigInt                       -> sun.misc.SignalHandler                             JDK internal API (jdk.unsupported)
+   org.agrona.concurrent.SigIntBarrier                -> sun.misc.Signal                                    JDK internal API (jdk.unsupported)
+   org.agrona.concurrent.SigIntBarrier                -> sun.misc.SignalHandler                             JDK internal API (jdk.unsupported)
+   org.agrona.concurrent.UnsafeBuffer                 -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   org.agrona.concurrent.broadcast.BroadcastReceiver  -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   org.agrona.concurrent.broadcast.BroadcastTransmitter -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   org.agrona.concurrent.ringbuffer.ManyToOneRingBuffer -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   org.agrona.concurrent.status.AtomicCounter         -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   org.agrona.concurrent.status.UnsafeBufferPosition  -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   org.agrona.concurrent.status.UnsafeBufferStatusIndicator -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+aspectjweaver-1.9.4.jar -> jdk.unsupported
+   org.aspectj.weaver.loadtime.ClassLoaderWeavingAdaptor -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+concurrentlinkedhashmap-lru-1.4.2.jar -> jdk.unsupported
+   com.googlecode.concurrentlinkedhashmap.ConcurrentHashMapV8 -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.googlecode.concurrentlinkedhashmap.ConcurrentHashMapV8$1 -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.googlecode.concurrentlinkedhashmap.ConcurrentHashMapV8$TreeBin -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+freemarker-2.3.29.jar -> java.xml
+   freemarker.ext.dom.SunInternalXalanXPathSupport    -> com.sun.org.apache.xml.internal.utils.PrefixResolver JDK internal API (java.xml)
+   freemarker.ext.dom.SunInternalXalanXPathSupport    -> com.sun.org.apache.xpath.internal.XPath            JDK internal API (java.xml)
+   freemarker.ext.dom.SunInternalXalanXPathSupport    -> com.sun.org.apache.xpath.internal.XPathContext     JDK internal API (java.xml)
+   freemarker.ext.dom.SunInternalXalanXPathSupport    -> com.sun.org.apache.xpath.internal.objects.XBoolean JDK internal API (java.xml)
+   freemarker.ext.dom.SunInternalXalanXPathSupport    -> com.sun.org.apache.xpath.internal.objects.XNodeSet JDK internal API (java.xml)
+   freemarker.ext.dom.SunInternalXalanXPathSupport    -> com.sun.org.apache.xpath.internal.objects.XNull    JDK internal API (java.xml)
+   freemarker.ext.dom.SunInternalXalanXPathSupport    -> com.sun.org.apache.xpath.internal.objects.XNumber  JDK internal API (java.xml)
+   freemarker.ext.dom.SunInternalXalanXPathSupport    -> com.sun.org.apache.xpath.internal.objects.XObject  JDK internal API (java.xml)
+   freemarker.ext.dom.SunInternalXalanXPathSupport    -> com.sun.org.apache.xpath.internal.objects.XString  JDK internal API (java.xml)
+   freemarker.ext.dom.SunInternalXalanXPathSupport$1  -> com.sun.org.apache.xml.internal.utils.PrefixResolver JDK internal API (java.xml)
+guava-28.1-jre.jar -> jdk.unsupported
+   com.google.common.cache.Striped64                  -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.google.common.cache.Striped64$1                -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.google.common.cache.Striped64$Cell             -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.google.common.hash.LittleEndianByteArray$UnsafeByteArray -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.google.common.hash.LittleEndianByteArray$UnsafeByteArray$1 -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.google.common.hash.LittleEndianByteArray$UnsafeByteArray$2 -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.google.common.hash.LittleEndianByteArray$UnsafeByteArray$3 -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.google.common.hash.Striped64                   -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.google.common.hash.Striped64$1                 -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.google.common.hash.Striped64$Cell              -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.google.common.primitives.UnsignedBytes$LexicographicalComparatorHolder$UnsafeComparator -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.google.common.primitives.UnsignedBytes$LexicographicalComparatorHolder$UnsafeComparator$1 -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.google.common.util.concurrent.AbstractFuture$UnsafeAtomicHelper$1 -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+kryo-4.0.2.jar -> jdk8internals
+kryo-4.0.2.jar -> java.base
+kryo-4.0.2.jar -> jdk.unsupported
+   com.esotericsoftware.kryo.io.UnsafeInput           -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.esotericsoftware.kryo.io.UnsafeMemoryInput     -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.esotericsoftware.kryo.io.UnsafeMemoryInput     -> sun.nio.ch.DirectBuffer                            JDK internal API (java.base)
+   com.esotericsoftware.kryo.io.UnsafeMemoryOutput    -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.esotericsoftware.kryo.io.UnsafeMemoryOutput    -> sun.nio.ch.DirectBuffer                            JDK internal API (java.base)
+   com.esotericsoftware.kryo.io.UnsafeOutput          -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.esotericsoftware.kryo.serializers.FieldSerializerUnsafeUtilImpl -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.esotericsoftware.kryo.serializers.UnsafeCacheFields$UnsafeBooleanField -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.esotericsoftware.kryo.serializers.UnsafeCacheFields$UnsafeByteField -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.esotericsoftware.kryo.serializers.UnsafeCacheFields$UnsafeCharField -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.esotericsoftware.kryo.serializers.UnsafeCacheFields$UnsafeDoubleField -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.esotericsoftware.kryo.serializers.UnsafeCacheFields$UnsafeFloatField -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.esotericsoftware.kryo.serializers.UnsafeCacheFields$UnsafeIntField -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.esotericsoftware.kryo.serializers.UnsafeCacheFields$UnsafeLongField -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.esotericsoftware.kryo.serializers.UnsafeCacheFields$UnsafeObjectField -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.esotericsoftware.kryo.serializers.UnsafeCacheFields$UnsafeRegionField -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.esotericsoftware.kryo.serializers.UnsafeCacheFields$UnsafeShortField -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.esotericsoftware.kryo.serializers.UnsafeCacheFields$UnsafeStringField -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.esotericsoftware.kryo.util.FastestStreamFactory -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.esotericsoftware.kryo.util.UnsafeUtil          -> sun.misc.Cleaner                                   JDK internal API (jdk8internals)
+   com.esotericsoftware.kryo.util.UnsafeUtil          -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.esotericsoftware.kryo.util.UnsafeUtil          -> sun.nio.ch.DirectBuffer                            JDK internal API (java.base)
+   com.esotericsoftware.kryo.util.UnsafeUtil$1        -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+logback-classic-1.2.3.jar -> jdk8internals
+   ch.qos.logback.classic.spi.PackagingDataCalculator -> sun.reflect.Reflection                             JDK internal API (jdk8internals)
+lz4-java-1.6.0.jar -> jdk.unsupported
+   net.jpountz.util.UnsafeUtils                       -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+msgpack-core-0.8.20.jar -> jdk.unsupported
+   org.msgpack.core.buffer.DirectBufferAccess         -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   org.msgpack.core.buffer.MessageBuffer              -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   org.msgpack.core.buffer.MessageBufferBE            -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+netty-all-4.1.47.Final.jar -> java.base
+netty-all-4.1.47.Final.jar -> jdk.unsupported
+   io.netty.handler.ssl.util.OpenJdkSelfSignedCertGenerator -> sun.security.util.ObjectIdentifier                 JDK internal API (java.base)
+   io.netty.handler.ssl.util.OpenJdkSelfSignedCertGenerator -> sun.security.x509.AlgorithmId                      JDK internal API (java.base)
+   io.netty.handler.ssl.util.OpenJdkSelfSignedCertGenerator -> sun.security.x509.CertificateAlgorithmId           JDK internal API (java.base)
+   io.netty.handler.ssl.util.OpenJdkSelfSignedCertGenerator -> sun.security.x509.CertificateIssuerName            JDK internal API (java.base)
+   io.netty.handler.ssl.util.OpenJdkSelfSignedCertGenerator -> sun.security.x509.CertificateSerialNumber          JDK internal API (java.base)
+   io.netty.handler.ssl.util.OpenJdkSelfSignedCertGenerator -> sun.security.x509.CertificateSubjectName           JDK internal API (java.base)
+   io.netty.handler.ssl.util.OpenJdkSelfSignedCertGenerator -> sun.security.x509.CertificateValidity              JDK internal API (java.base)
+   io.netty.handler.ssl.util.OpenJdkSelfSignedCertGenerator -> sun.security.x509.CertificateVersion               JDK internal API (java.base)
+   io.netty.handler.ssl.util.OpenJdkSelfSignedCertGenerator -> sun.security.x509.CertificateX509Key               JDK internal API (java.base)
+   io.netty.handler.ssl.util.OpenJdkSelfSignedCertGenerator -> sun.security.x509.X500Name                         JDK internal API (java.base)
+   io.netty.handler.ssl.util.OpenJdkSelfSignedCertGenerator -> sun.security.x509.X509CertImpl                     JDK internal API (java.base)
+   io.netty.handler.ssl.util.OpenJdkSelfSignedCertGenerator -> sun.security.x509.X509CertInfo                     JDK internal API (java.base)
+   io.netty.util.internal.CleanerJava9                -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.netty.util.internal.CleanerJava9$1              -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.netty.util.internal.CleanerJava9$2              -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.netty.util.internal.PlatformDependent$Mpsc$1    -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.netty.util.internal.PlatformDependent0          -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.netty.util.internal.PlatformDependent0$1        -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.netty.util.internal.PlatformDependent0$2        -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.netty.util.internal.PlatformDependent0$3        -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.netty.util.internal.PlatformDependent0$5        -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.netty.util.internal.shaded.org.jctools.queues.BaseLinkedQueueConsumerNodeRef -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.netty.util.internal.shaded.org.jctools.queues.BaseLinkedQueueProducerNodeRef -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.netty.util.internal.shaded.org.jctools.queues.BaseMpscLinkedArrayQueueColdProducerFields -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.netty.util.internal.shaded.org.jctools.queues.BaseMpscLinkedArrayQueueConsumerFields -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.netty.util.internal.shaded.org.jctools.queues.BaseMpscLinkedArrayQueueProducerFields -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.netty.util.internal.shaded.org.jctools.queues.LinkedQueueNode -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.netty.util.internal.shaded.org.jctools.queues.MpscArrayQueueConsumerIndexField -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.netty.util.internal.shaded.org.jctools.queues.MpscArrayQueueProducerIndexField -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.netty.util.internal.shaded.org.jctools.queues.MpscArrayQueueProducerLimitField -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.netty.util.internal.shaded.org.jctools.util.UnsafeAccess -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   io.netty.util.internal.shaded.org.jctools.util.UnsafeRefArrayAccess -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+objenesis-2.5.1.jar -> jdk.unsupported
+   org.objenesis.instantiator.sun.UnsafeFactoryInstantiator -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+protobuf-java-3.5.1.jar -> jdk.unsupported
+   com.google.protobuf.UnsafeUtil                     -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.google.protobuf.UnsafeUtil$1                   -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.google.protobuf.UnsafeUtil$JvmMemoryAccessor   -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   com.google.protobuf.UnsafeUtil$MemoryAccessor      -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+reactor-core-3.2.11.RELEASE.jar -> jdk8internals
+reactor-core-3.2.11.RELEASE.jar -> jdk.unsupported
+   reactor.core.publisher.MultiProducerRingBuffer     -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   reactor.core.publisher.RingBuffer                  -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   reactor.core.publisher.RingBufferFields            -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   reactor.core.publisher.Traces$SharedSecretsCallSiteSupplierFactory$TracingException -> sun.misc.JavaLangAccess                            JDK internal API (jdk8internals)
+   reactor.core.publisher.Traces$SharedSecretsCallSiteSupplierFactory$TracingException -> sun.misc.SharedSecrets                             JDK internal API (jdk8internals)
+   reactor.core.publisher.UnsafeSequence              -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   reactor.core.publisher.UnsafeSupport               -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+spring-core-5.2.8.RELEASE.jar -> jdk.unsupported
+   org.springframework.objenesis.instantiator.sun.UnsafeFactoryInstantiator -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   org.springframework.objenesis.instantiator.util.DefineClassHelper$Java8 -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+   org.springframework.objenesis.instantiator.util.UnsafeUtils -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+thorin-common-0.0.1-SNAPSHOT.jar -> java.base
+thorin-common-0.0.1-SNAPSHOT.jar -> jdk.unsupported
+   cn.nextop.thorin.common.util.Buffers               -> jdk.internal.ref.Cleaner                           JDK internal API (java.base)
+   cn.nextop.thorin.common.util.Buffers               -> sun.nio.ch.DirectBuffer                            JDK internal API (java.base)
+   cn.nextop.thorin.common.util.Unsafes               -> sun.misc.Unsafe                                    JDK internal API (jdk.unsupported)
+
+Warning: JDK internal APIs are unsupported and private to JDK implementation that are
+subject to be removed or changed incompatibly and could break your application.
+Please modify your code to eliminate dependence on any JDK internal APIs.
+For the most recent update on JDK internal API replacements, please check:
+https://wiki.openjdk.java.net/display/JDK8/Java+Dependency+Analysis+Tool
+
+JDK Internal API                         Suggested Replacement
+----------------                         ---------------------
+jdk.internal.ref.Cleaner                 Use java.lang.ref.PhantomReference @since 1.2 or java.lang.ref.Cleaner @since 9
+sun.misc.Cleaner                         Use java.lang.ref.PhantomReference @since 1.2 or java.lang.ref.Cleaner @since 9
+sun.misc.JavaLangAccess                  Removed. See http://openjdk.java.net/jeps/260
+sun.misc.SharedSecrets                   Removed. See http://openjdk.java.net/jeps/260
+sun.misc.Signal                          See http://openjdk.java.net/jeps/260
+sun.misc.SignalHandler                   See http://openjdk.java.net/jeps/260
+sun.misc.Unsafe                          See http://openjdk.java.net/jeps/260
+sun.reflect.Reflection                   Use java.lang.StackWalker @since 9
+sun.security.x509.X500Name               Use javax.security.auth.x500.X500Principal @since 1.4
+
 ```
   
 ## step 5: 构建

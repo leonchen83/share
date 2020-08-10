@@ -57,7 +57,7 @@ OS name: "windows 7", version: "6.1", arch: "amd64", family: "windows"
 
 ```
 
-利用jdk12+的jdeps检测依赖了哪些内部包（jdk11的jdeps有bug）, `$project`代表你自己工程编译好的jar包
+利用jdk12+的jdeps检测依赖了哪些内部包（jdk11的jdeps有[bug](https://bugs.openjdk.java.net/browse/JDK-8207162)）, `$project`代表你自己工程编译好的jar包
 ```java  
 jdeps --multi-release 11 --jdk-internals -R --class-path 'libs/*' $project
 ```

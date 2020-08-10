@@ -24,7 +24,7 @@ OS name: "windows 7", version: "6.1", arch: "amd64", family: "windows"
   
 ## step 3: 升级maven的compiler插件到3.8.1
   
-## step 4: 把一些不支持的api导出成ALL-UNNAMED, 并把target改成11
+## step 4: 把一些不支持的api导出成ALL-UNNAMED, 并把source和target改成11
   
 ```xml  
 
@@ -46,7 +46,7 @@ OS name: "windows 7", version: "6.1", arch: "amd64", family: "windows"
     </plugins>
 ```
   
-注意用到`javax.annotation.PostConstruct`,`javax.annotation.Resources`,`javax.annotation.Resource`,`javax.annotation.PreDestroy`等注解需要单独依赖jakarta等相关Jar包
+注意用到`javax.annotation.PostConstruct`, `javax.annotation.Resources`, `javax.annotation.Resource`, `javax.annotation.PreDestroy` 等注解需要单独依赖jakarta等相关Jar包
 ```java  
 
 <dependency>
@@ -57,15 +57,16 @@ OS name: "windows 7", version: "6.1", arch: "amd64", family: "windows"
 
 ```
 
-利用jdk12+的jdeps检测依赖了哪些内部包（jdk11的jdeps有bug）， `$project`代表你自己工程编译好的jar包
+利用jdk12+的jdeps检测依赖了哪些内部包（jdk11的jdeps有bug）, `$project`代表你自己工程编译好的jar包
 ```java  
 jdeps --multi-release 11 --jdk-internals -R --class-path 'libs/*' $project
 ```
 
-结果类似如下, 凡是用到`jdk8internals`的包都要检查运行时有没有被调用到，如果没被调用，可以安全升级（因为不兼容）
+结果类似如下, 凡是用到`jdk8internals`的包都要检查运行时有没有被调用到; 如果没被调用, 可以安全升级（因为不兼容）
 
 ```java  
 $ jdeps  --multi-release 11 --jdk-internals -R --class-path './dep/*' ./lib/*.jar
+
 Warning: split package: javax.xml.parsers jrt:/java.xml ./dep/xml-apis-1.0.b2.jar
 Warning: split package: javax.xml.transform jrt:/java.xml ./dep/xml-apis-1.0.b2.jar
 Warning: split package: javax.xml.transform.dom jrt:/java.xml ./dep/xml-apis-1.0.b2.jar
@@ -267,10 +268,8 @@ sun.security.x509.X500Name               Use javax.security.auth.x500.X500Princi
 ```
 
 ## step 5: 构建
-  
-`mvn clean install -Dmaven.test.skip=true`  
-  
-一些依赖包升级
+
+一些关于字节码的依赖包升级
 ```java  
 
 <dependency>
@@ -287,20 +286,28 @@ sun.security.x509.X500Name               Use javax.security.auth.x500.X500Princi
 
 ```
 
+升级完成之后maven打包  
+
+`mvn clean install -Dmaven.test.skip=true`  
+  
+
 ## step 6: 运行时
 
 运行时可能会有如下cglib警告 
 ```java  
 WARNING: An illegal reflective access operation has occurred
-WARNING: Illegal reflective access by net.sf.cglib.core.ReflectUtils$1 (file:/C:/Users/chenby/.m2/repository/cglib/cglib/3.3.0/cglib-3.3.0.jar) to method java.lang.ClassLoader.defineClass(java.lang.String,byte[],int,int,java.security.ProtectionDomain)
+WARNING: Illegal reflective access by net.sf.cglib.core.ReflectUtils$1 
+         (file:/C:/Users/chenby/.m2/repository/cglib/cglib/3.3.0/cglib-3.3.0.jar) 
+         to method java.lang.ClassLoader.defineClass(java.lang.String,byte[],int,int,java.security.ProtectionDomain)
 WARNING: Please consider reporting this to the maintainers of net.sf.cglib.core.ReflectUtils$1
 WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
 WARNING: All illegal access operations will be denied in a future release
 ```
 
-处理这个警告需要在运行时添加`--add-opens=$module/$package=ALL-UNNAMED`, 根据警告上的`java.lang.ClassLoader.defineClass`关键字， 如上警告运行时需要添加`--add-opens=java.base/java.lang=ALL-UNNAMED`,以便让cglib可以反射调用私有方法, 具体参考[What's the difference between --add-exports and --add-opens in Java 9?](https://stackoverflow.com/questions/44056405/whats-the-difference-between-add-exports-and-add-opens-in-java-9)  
+处理这个警告需要在运行时添加`--add-opens=$module/$package=ALL-UNNAMED`, 根据警告上的`java.lang.ClassLoader.defineClass`关键字, 如上警告运行时需要添加`--add-opens=java.base/java.lang=ALL-UNNAMED`, 以便让cglib可以反射调用私有方法.  
+具体参考[What's the difference between --add-exports and --add-opens in Java 9?](https://stackoverflow.com/questions/44056405/whats-the-difference-between-add-exports-and-add-opens-in-java-9)  
   
-根据jdeps的依赖分析，以及cglib需要添加的参数，总结出实际的运行时需要添加如下参数  
+根据jdeps的依赖分析, 以及cglib需要添加的参数, 总结出实际运行时需要添加如下参数  
 
 ```java  
 --add-opens=java.base/java.lang=ALL-UNNAMED 
@@ -314,9 +321,13 @@ WARNING: All illegal access operations will be denied in a future release
 --add-opens=java.xml/com.sun.org.apache.xml.internal.utils=ALL-UNNAMED 
 ```
 
-一些废弃的jvm options，如下参数已经删除或者废弃，其中`-XX:+AggressiveOpts` 标记为`deprecated`但仍然能够使用, `snmp`已经完全废弃. gc相关的参数可以另行替代
+一些废弃的jvm options, 如下参数已经删除或者废弃. 其中`-XX:+AggressiveOpts` 标记为`deprecated`但仍然能够使用. `snmp`已经完全废弃. gc相关的参数可以另行替代  
 ```java  
--Dcom.sun.management.snmp.port=$port -Dcom.sun.management.snmp.acl=false -Dcom.sun.management.snmp.interface=0.0.0.0 -XX:+AggressiveOpts -verbose:gc -XX:+PrintGCCause -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime
+-Dcom.sun.management.snmp.port=$port 
+-Dcom.sun.management.snmp.acl=false 
+-Dcom.sun.management.snmp.interface=0.0.0.0 
+-XX:+AggressiveOpts 
+-verbose:gc -XX:+PrintGCCause -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime
 ```
 
 替代如上gc相关参数, 可以把stdout改成`file=/path/to/gc.log` 把相关gc日志保存到指定文件, 例子只输出到stdout

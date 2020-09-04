@@ -334,6 +334,7 @@ WARNING: All illegal access operations will be denied in a future release
 ```java  
 -Xlog:gc,safepoint:stdout:time
 ```
+替换-XX:+AggressiveOpts 为 `-XX:AutoBoxCacheMax=20000 -XX:BiasedLockingStartupDelay=500`
 
 # 一些有用的链接
 

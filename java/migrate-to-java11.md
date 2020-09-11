@@ -293,7 +293,7 @@ sun.security.x509.X500Name               Use javax.security.auth.x500.X500Princi
 
 ## step 6: 运行时
 
-运行时可能会有如下cglib警告 
+当有反射调用时, 可能会有如下警告 
 ```java  
 WARNING: An illegal reflective access operation has occurred
 WARNING: Illegal reflective access by net.sf.cglib.core.ReflectUtils$1 
@@ -304,10 +304,10 @@ WARNING: Use --illegal-access=warn to enable warnings of further illegal reflect
 WARNING: All illegal access operations will be denied in a future release
 ```
 
-处理这个警告需要在运行时添加`--add-opens=$module/$package=ALL-UNNAMED`, 根据警告上的`java.lang.ClassLoader.defineClass`关键字, 如上警告运行时需要添加`--add-opens=java.base/java.lang=ALL-UNNAMED`, 以便让cglib可以反射调用私有方法.  
+处理这个警告需要在运行时添加`--add-opens=$module/$package=ALL-UNNAMED`, 根据警告上的`java.lang.ClassLoader.defineClass`关键字, 如上警告运行时需要添加`--add-opens=java.base/java.lang=ALL-UNNAMED`, 以便让可以反射调用私有方法.  
 具体参考[What's the difference between --add-exports and --add-opens in Java 9?](https://stackoverflow.com/questions/44056405/whats-the-difference-between-add-exports-and-add-opens-in-java-9)  
   
-根据jdeps的依赖分析, 以及cglib需要添加的参数, 总结出实际运行时需要添加如下参数  
+根据jdeps的依赖分析, 以及反射调用需要添加的参数, 总结出实际运行时需要添加如下参数  
 
 ```java  
 --add-opens=java.base/java.lang=ALL-UNNAMED 

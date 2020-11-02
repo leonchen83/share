@@ -8,3 +8,6 @@ git rebase -i `<SHA>` (不包含)  
 wq保存退出  
 提交到远端  
 git push --force origin master  
+
+合并前两个提交并更改sign-off信息
+git rebase -i HEAD~2 -x "git commit --amend --author 'Baoyi Chen <chen.bao.yi@qq.com>' --no-edit"

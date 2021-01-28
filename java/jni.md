@@ -1,3 +1,13 @@
+# Install jemalloc
+```
+$ wget https://github.com/jemalloc/jemalloc/releases/download/5.2.1/jemalloc-5.2.1.tar.bz2
+$ tar -xvf jemalloc-5.2.1.tar.bz2
+$ cd jemalloc-5.2.1
+$ ./configure --with-jemalloc-prefix=je_ --disable-initial-exec-tls\
+$ make
+$ make install
+```
+
 # NativeJemalloc.java
 
 ```
@@ -104,6 +114,7 @@ JNIEXPORT jlong JNICALL Java_NativeJemalloc_je_1aligned_1alloc
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_NativeJemalloc_je_1free(JNIEnv *env, jclass class, jlong ptr) {
+    je_free((void*)ptr);
     return;
 }
 
@@ -122,6 +133,7 @@ JNIEXPORT jlong JNICALL Java_NativeJemalloc_je_1malloc(JNIEnv *env, jclass class
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_NativeJemalloc_je_1aligned_1free(JNIEnv *env, jclass class, jlong ptr) {
+    je_free((void*)ptr);
     return;
 }
 
@@ -131,7 +143,7 @@ JNIEXPORT void JNICALL Java_NativeJemalloc_je_1aligned_1free(JNIEnv *env, jclass
  * Signature: (JJ)J
  */
 JNIEXPORT jlong JNICALL Java_NativeJemalloc_je_1calloc(JNIEnv *env, jclass class, jlong num, jlong size) {
-    return 0;
+    return (jlong)je_calloc(num, size);
 }
 /*
  * Class:     NativeJemalloc
@@ -139,7 +151,7 @@ JNIEXPORT jlong JNICALL Java_NativeJemalloc_je_1calloc(JNIEnv *env, jclass class
  * Signature: (JJ)J
  */
 JNIEXPORT jlong JNICALL Java_NativeJemalloc_je_1realloc(JNIEnv *env, jclass class, jlong ptr, jlong size) {
-    return 0;
+    return (jlong)je_realloc((void*)ptr, size);
 }
 
 /*
@@ -148,14 +160,14 @@ JNIEXPORT jlong JNICALL Java_NativeJemalloc_je_1realloc(JNIEnv *env, jclass clas
  * Signature: (JJ)J
  */
 JNIEXPORT jlong JNICALL Java_NativeJemalloc_je_1aligned_1alloc(JNIEnv *env, jclass class, jlong alignment, jlong size) {
-    return 0;
+    return (jlong)je_aligned_alloc(alignment, size);
 }
 ```
 
 # compile
 ```
-# gcc -c -fPIC NativeJemalloc.c -o NativeJemalloc.o -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -I`jemalloc-config --includedir`
-# gcc -shared -o libnje.so NativeJemalloc.o -Wl,-rpath,/usr/local/lib -L/usr/local/lib -ljemalloc
+$ gcc -c -fPIC NativeJemalloc.c -o NativeJemalloc.o -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -I`jemalloc-config --includedir`
+$ gcc -shared -o libnje.so NativeJemalloc.o -Wl,-rpath,/usr/local/lib -L/usr/local/lib -ljemalloc
 ```
 
 # run

@@ -178,3 +178,27 @@ gcc -shared -Wl,-soname,libfma.so  -o lib/libfma.so src/jemalloc.pic.o src/arena
 javac NativeJemalloc.java
 java -Djava.library.path=. NativeJemalloc
 ```
+
+# update gcc
+```
+sudo yum install centos-release-scl
+sudo yum install devtoolset-7-gcc*
+scl enable devtoolset-7 bash
+which gcc
+gcc --version
+```
+
+# static link
+
+```
+#mimalloc
+ar -x libmimalloc.a
+gcc -shared -Wl,-soname,libfma.so  -o libfma.so *.o -lm -lrt -lpthread
+
+#jemalloc
+ar -x libjemalloc_pic.a
+gcc -shared -Wl,-soname,libfma.so  -o libfma.so *.o -lm -ldl -pthread
+
+#tcmalloc
+
+```

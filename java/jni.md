@@ -168,6 +168,9 @@ JNIEXPORT jlong JNICALL Java_NativeJemalloc_je_1aligned_1alloc(JNIEnv *env, jcla
 ```
 $ gcc -c -fPIC NativeJemalloc.c -o NativeJemalloc.o -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -I`jemalloc-config --includedir`
 $ gcc -shared -o libnje.so NativeJemalloc.o -Wl,-rpath,/usr/local/lib -L/usr/local/lib -ljemalloc
+
+# static link
+gcc -shared -Wl,-soname,libfma.so  -o lib/libfma.so src/jemalloc.pic.o src/arena.pic.o src/background_thread.pic.o src/base.pic.o src/bin.pic.o src/bitmap.pic.o src/ckh.pic.o src/ctl.pic.o src/div.pic.o src/extent.pic.o src/extent_dss.pic.o src/extent_mmap.pic.o src/hash.pic.o src/hook.pic.o src/large.pic.o src/log.pic.o src/malloc_io.pic.o src/mutex.pic.o src/mutex_pool.pic.o src/nstime.pic.o src/pages.pic.o src/prng.pic.o src/prof.pic.o src/rtree.pic.o src/safety_check.pic.o src/stats.pic.o src/sc.pic.o src/sz.pic.o src/tcache.pic.o src/test_hooks.pic.o src/ticker.pic.o src/tsd.pic.o src/witness.pic.o /home/chenby/c/Jemalloc.o  -lm  -pthread -ldl
 ```
 
 # run

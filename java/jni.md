@@ -200,5 +200,10 @@ ar -x libjemalloc_pic.a
 gcc -shared -Wl,-soname,libfma.so  -o libfma.so *.o -lm -ldl -pthread
 
 #tcmalloc
+./configure --disable-cpu-profiler CFLAGS=-fPIC CXXFLAGS=-fPIC CPPFLAGS=-fPIC
+make
+make install
+ar -x libtcmalloc.a
+gcc -shared -Wl,-soname,libfma.so  -o libfma.so *.o -lm  -pthread -lstdc++
 
 ```

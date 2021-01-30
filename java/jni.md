@@ -6,6 +6,29 @@ $ cd jemalloc-5.2.1
 $ ./configure --with-jemalloc-prefix=je_ --disable-initial-exec-tls
 $ make
 $ make install
+
+# /usr/local/lib
+```
+
+# Install gperftools
+```
+wget https://github.com/gperftools/gperftools/releases/download/gperftools-2.8.1/gperftools-2.8.1.tar.gz
+tar -xvf gperftools-2.8.1.tar.gz
+cd gperftools-2.8.1
+./configure --disable-cpu-profiler CFLAGS=-fPIC CXXFLAGS=-fPIC CPPFLAGS=-fPIC
+make
+make install
+
+# /usr/local/lib
+```
+
+# Install mimalloc
+```
+wget https://github.com/microsoft/mimalloc/archive/v1.6.7.tar.gz
+tar -xvf v1.6.7.tar.gz
+cd v1.6.7
+cmake .
+make
 ```
 
 # NativeJemalloc.java

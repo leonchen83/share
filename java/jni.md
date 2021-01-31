@@ -225,7 +225,7 @@ gcc --version
 ```
 #mimalloc
 ar -x libmimalloc.a
-gcc -shared -Wl,-soname,libfma.so  -o libfma.so *.o -lm -lrt -lpthread
+gcc -shared -Wl,-soname,libfma.so  -o libfma.so *.o  -lpthread -lrt 
 
 #jemalloc
 ar -x libjemalloc_pic.a
@@ -236,6 +236,6 @@ gcc -shared -Wl,-soname,libfma.so  -o libfma.so *.o -lm -ldl -pthread
 make
 make install
 ar -x libtcmalloc.a
-gcc -shared -Wl,-soname,libfma.so  -o libfma.so *.o -lm  -pthread -lstdc++
+gcc -shared -Wl,-soname,libfma.so  -o libfma.so *.o -pthread -lstdc++ -lm  
 
 ```

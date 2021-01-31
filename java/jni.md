@@ -29,6 +29,8 @@ tar -xvf v1.6.7.tar.gz
 cd v1.6.7
 cmake .
 make
+
+# /usr/local/lib/mimalloc-1.6
 ```
 
 # NativeJemalloc.java

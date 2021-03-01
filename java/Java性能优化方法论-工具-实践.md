@@ -40,19 +40,57 @@ in programming.
 
 # 工具
 
-#### 1. 单元测试
+#### 1. 单元测试 & 回归测试
 --------------
 
 #### 2. JMH
+```xml  
+<dependency>
+    <groupId>org.openjdk.jmh</groupId>
+    <artifactId>jmh-core</artifactId>
+    <version>1.25.2</version>
+</dependency>
+<dependency>
+    <groupId>org.openjdk.jmh</groupId>
+    <artifactId>jmh-generator-annprocess</artifactId>
+    <version>1.25.2</version>
+</dependency>
+```
 --------------
-
+```java  
+@State(Scope.Benchmark)
+@Warmup(iterations = 3, time = 1, timeUnit = TimeUnit.SECONDS)
+@Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
+public class EnumMapBenchmark {
+	Map<Validation, Boolean> map = new HashMap<>();
+	Map<Validation, Boolean> enumMap = new EnumMap<>(Validation.class);
+	@Setup
+	public void setup() {
+		map.put(Validation.INVALID, TRUE);
+		map.put(Validation.EXPIRED, TRUE);
+		enumMap.put(Validation.INVALID, TRUE);
+		enumMap.put(Validation.EXPIRED, TRUE);
+	}
+	@Benchmark
+	public Boolean measureEnumMap() { return enumMap.get(INVALID); }
+	@Benchmark
+	public Boolean measureMap() { return map.get(INVALID); }
+}
+```
+---------------
+```
+ Benchmark                         Mode  Cnt         Score      Error  Units
+ EnumMapBenchmark.measureEnumMap  thrpt    5  19824783.306 ± 3662.429  ops/s
+ EnumMapBenchmark.measureMap      thrpt    5  14834630.039 ± 1054.444  ops/s
+```
+---------------
 #### 3. async-profiler
 --------------
 
 #### 4. Monitor系统
 --------------
 
-#### 5. 压力测试 & 回归测试
+#### 5. 压力测试
 --------------
 
 ## 实践

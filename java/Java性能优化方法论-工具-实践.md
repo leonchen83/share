@@ -89,16 +89,18 @@ public class EnumMapBenchmark {
 # https://github.com/jvm-profiling-tools/async-profiler/releases
 > tar -xvf async-profiler-1.8.4-linux-x64.tar.gz
 > cd async-profiler-1.8.4
-> jps
+> $JAVA_HOME/bin/jps
   9234 Jps
-  8983 your-java-process
-> ./profiler.sh -d 30 -e cpu -f /tmp/your-java-process-cpu.svg 8983
-> ./profiler.sh -d 30 -e alloc -f /tmp/your-java-process-cpu.svg 8983
+  8983 your-java-program
+> ./profiler.sh -d 30 -e cpu -f /tmp/your-java-program-cpu.svg 8983
+> ./profiler.sh -d 30 -e alloc -f /tmp/your-java-program-alloc.svg 8983
 ```
 --------------
 
 #### 4. Monitor系统
+
 --------------
+
 
 #### 5. 压力测试
 --------------
@@ -109,8 +111,30 @@ public class EnumMapBenchmark {
 --------------
 
 #### 2. 构建Monitor系统
+```java  
+public void timeConsumingMethod() {
+    long st = System.nanoTime();
+    // do something
+    ....
+    long ed = System.nanoTime();
+    logger.debug("{}, {}, {}", name, method, (ed - st));
+}
+
+```
 --------------
-#### 3. 编写JMH性能测试
+```
+public void timeConsumingMethod() {
+    long st = System.nanoTime();
+    // do something
+    ....
+    long ed = System.nanoTime();
+    monitor.add(metric, COUNTER, (ed - st));
+    // monitor.add(metric, GAUGE, value);
+}
+
+```
+--------------
+#### 3. 编写JMH性能测试注意的问题
 --------------
 #### 4. GC对性能的影响
 --------------

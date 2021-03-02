@@ -79,12 +79,22 @@ public class EnumMapBenchmark {
 ```
 ---------------
 ```
- Benchmark                         Mode  Cnt         Score      Error  Units
- EnumMapBenchmark.measureEnumMap  thrpt    5  19824783.306 ± 3662.429  ops/s
- EnumMapBenchmark.measureMap      thrpt    5  14834630.039 ± 1054.444  ops/s
+ Benchmark        Mode  Cnt         Score      Error  Units
+ measureEnumMap  thrpt    5  19824783.306 ± 3662.429  ops/s
+ measureMap      thrpt    5  14834630.039 ± 1054.444  ops/s
 ```
 ---------------
 #### 3. async-profiler
+```
+# https://github.com/jvm-profiling-tools/async-profiler/releases
+> tar -xvf async-profiler-1.8.4-linux-x64.tar.gz
+> cd async-profiler-1.8.4
+> jps
+  9234 Jps
+  8983 your-java-process
+> ./profiler.sh -d 30 -e cpu -f /tmp/your-java-process-cpu.svg 8983
+> ./profiler.sh -d 30 -e alloc -f /tmp/your-java-process-cpu.svg 8983
+```
 --------------
 
 #### 4. Monitor系统

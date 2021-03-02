@@ -109,6 +109,29 @@ public class EnumMapBenchmark {
 
 #### 1. 对第三方依赖进行封装
 --------------
+##### 优点
+1. 可以让第三方依赖的类缩小在某一个范围内
+2. 可以针对某些特性对第三方类库进行性能优化
+3. 可以加入特定的埋点进行监控
+--------------
+##### 缺点
+1. 考验研发人员的水平，封装的不好还不如不封装
+2. 需要一定的工作量来封装，不是开箱即用
+3. 需要深刻理解业务，根据业务要求封装
+--------------
+```
+String json = JSON.toJSONString(person);
+Person person = JSON.parseObject(json, Person.class);
+```
+```
+public interface JsonMarshaller {
+    <T> T read(String json, Class<T> clazz);
+    <T> T read(InputStream json, Class<T> clazz);
+    String write(Object value);
+    void write(OutputStream out, Object value);
+}
+```
+--------------
 
 #### 2. 构建Monitor系统
 ```java  
@@ -230,8 +253,21 @@ services:
 ```
 --------------
 #### 4. GC对性能的影响
+```
+Total time for which application threads were stopped: 0.3110979 seconds, 
+Stopping threads took: 0.0000309 seconds
+Application time: 1.0001194 seconds
+```
+
+Etcd分布式锁由于gc时间过长导致续期失败，进而HA切换
+
+--------------
+1. 升级Jdk版本
+2. 吞吐优先还是延迟优先(-XX:MaxGCPauseMillis)
+3. 避免创建过多临时对象
 --------------
 #### 5. 如何避免创建过多的临时对象
+
 --------------
 #### 6. 设计lock free架构与异步编程
 --------------

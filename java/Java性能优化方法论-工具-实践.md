@@ -29,6 +29,8 @@ in programming.
 --------------
 
 #### 3. 性能优化的边际效益递减原则
+![w:700 h:600](https://github.com/leonchen83/share/blob/master/java/optimize-profit.jpg?raw=true)  
+
 --------------
 
 #### 4. 设计性能优化友好的架构
@@ -40,7 +42,7 @@ in programming.
 --------------
 # 工具
 
-#### 1. 单元测试 & 回归测试
+#### 1. 单元测试 & 回归测试 & 压力测试
 --------------
 
 #### 2. JMH
@@ -97,12 +99,16 @@ public class EnumMapBenchmark {
 ```
 --------------
 
-#### 4. Monitor系统
+![w:800 h:500](https://github.com/leonchen83/share/blob/master/java/profile-alloc.png?raw=true)  
 
 --------------
 
+#### 4. Monitor系统
+![w:800 h:300](https://github.com/leonchen83/share/blob/master/java/monitor1.png?raw=true)  
 
-#### 5. 压力测试
+--------------
+![w:800 h:300](https://github.com/leonchen83/share/blob/master/java/monitor.png?raw=true)  
+
 --------------
 
 ## 实践
@@ -123,6 +129,7 @@ public class EnumMapBenchmark {
 String json = JSON.toJSONString(person);
 Person person = JSON.parseObject(json, Person.class);
 ```
+---------------
 ```
 public interface JsonMarshaller {
     <T> T read(String json, Class<T> clazz);

@@ -37,7 +37,7 @@ in programming.
 2. 原型
 3. 扩展
 4. 封装
-
+--------------
 # 工具
 
 #### 1. 单元测试 & 回归测试
@@ -62,19 +62,19 @@ in programming.
 @Warmup(iterations = 3, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 public class EnumMapBenchmark {
-	Map<Validation, Boolean> map = new HashMap<>();
-	Map<Validation, Boolean> enumMap = new EnumMap<>(Validation.class);
-	@Setup
-	public void setup() {
-		map.put(Validation.INVALID, TRUE);
-		map.put(Validation.EXPIRED, TRUE);
-		enumMap.put(Validation.INVALID, TRUE);
-		enumMap.put(Validation.EXPIRED, TRUE);
-	}
-	@Benchmark
-	public Boolean measureEnumMap() { return enumMap.get(INVALID); }
-	@Benchmark
-	public Boolean measureMap() { return map.get(INVALID); }
+    Map<Validation, Boolean> map = new HashMap<>();
+    Map<Validation, Boolean> enumMap = new EnumMap<>(Validation.class);
+    @Setup
+    public void setup() {
+        map.put(Validation.INVALID, TRUE);
+        map.put(Validation.EXPIRED, TRUE);
+        enumMap.put(Validation.INVALID, TRUE);
+        enumMap.put(Validation.EXPIRED, TRUE);
+    }
+    @Benchmark
+    public Boolean measureEnumMap() { return enumMap.get(INVALID); }
+    @Benchmark
+    public Boolean measureMap() { return map.get(INVALID); }
 }
 ```
 ---------------
@@ -122,7 +122,7 @@ public void timeConsumingMethod() {
 
 ```
 --------------
-```
+```java  
 public void timeConsumingMethod() {
     long st = System.nanoTime();
     // do something
@@ -134,7 +134,100 @@ public void timeConsumingMethod() {
 
 ```
 --------------
+```
++---------+  metric  +---------+           +---------+ 
+| MODULE1 |--------->|         |           |         |
++---------+          |         |           |         |
+                     |         |           |         |
++---------+  metric  |         |   query   |         |
+| MODULE2 |--------->|INFLUXDB |---------->| GRAFANA |
++---------+          |         |           |         |
+                     |         |           |         |
++---------+  metric  |         |           |         |
+| MODULE3 |--------->|         |           |         |
++---------+          +---------+           +---------+ 
+```
+--------------
+```
+services:
+  influxdb:
+    image: influxdb:1.7.9
+    container_name: influxdb
+    ports:
+      - "8086:8086"
+    volumes:
+      - ./influxdb/:/docker-entrypoint-initdb.d
+    restart: on-failure
+  grafana:
+    image: grafana/grafana:5.3.2
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/provisioning/:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    links:
+      - influxdb
+    restart: on-failure
+```
+--------------
 #### 3. 编写JMH性能测试注意的问题
+##### 避免编译优化
+```
+    @Benchmark
+    @Fork(1)
+    public void benchThreadLocal() {
+        raw.set(value); raw.get();
+    }
+
+    @Benchmark
+    @Fork(1)
+    public void benchThreadLocal(Blackhole bh) {
+        raw.set(value); bh.consume(raw.get());
+    }
+```
+--------------
+##### 避免常量折叠
+```
+    private double x = Math.PI;
+    private final double wrongX = Math.PI;
+
+    @Benchmark
+    public double measureWrong_1() {
+        return Math.log(Math.PI);
+    }
+
+    @Benchmark
+    public double measureWrong_2() {
+        return Math.log(wrongX);
+    }
+
+    @Benchmark
+    public double measureRight() {
+        return Math.log(x);
+    }
+```
+--------------
+##### 避免循环优化
+```
+    @Benchmark
+    public int measureRight() {
+        return (x + y);
+    }
+
+    private int reps(int reps) {
+        int s = 0;
+        for (int i = 0; i < reps; i++) {
+            s += (x + y);
+        }
+        return s;
+    }
+
+    @Benchmark
+    public int measureWrong_100() {
+        return reps(100);
+    }
+```
 --------------
 #### 4. GC对性能的影响
 --------------

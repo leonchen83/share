@@ -12,7 +12,7 @@ _paginate: false
 #### 1. 为什么要做性能优化
 
 * 双11电商促销, 直播平台, 交易系统, 12306春运购票
-* 性能优化就是用最小的人力成本和硬件成本满足系统的性能指标
+* 性能优化就是用最小的人力成本和硬件成本满足系统不断变化的性能指标
 --------------
 
 #### 2. 过早优化是万恶之源？
@@ -41,9 +41,6 @@ in programming.
 4. 封装
 --------------
 # 工具
-
-#### 1. 单元测试 & 回归测试 & 压力测试
---------------
 
 #### 2. JMH
 ```xml  
@@ -115,16 +112,6 @@ public class EnumMapBenchmark {
 
 #### 1. 对第三方依赖进行封装
 --------------
-##### 优点
-1. 可以让第三方依赖的类缩小在某一个范围内
-2. 可以针对某些特性对第三方类库进行性能优化
-3. 可以加入特定的埋点进行监控
---------------
-##### 缺点
-1. 考验研发人员的水平，封装的不好还不如不封装
-2. 需要一定的工作量来封装，不是开箱即用
-3. 需要深刻理解业务，根据业务要求封装
---------------
 ```
 String json = JSON.toJSONString(person);
 Person person = JSON.parseObject(json, Person.class);
@@ -138,6 +125,17 @@ public interface JsonMarshaller {
     void write(OutputStream out, Object value);
 }
 ```
+--------------
+
+##### 优点
+1. 可以让第三方依赖的类缩小在某一个范围内
+2. 可以针对某些特性对第三方类库进行性能优化
+3. 可以加入特定的埋点进行监控
+--------------
+##### 缺点
+1. 考验研发人员的水平，封装的不好还不如不封装
+2. 需要一定的工作量来封装，不是开箱即用
+3. 需要深刻理解业务，根据业务要求封装
 --------------
 
 #### 2. 构建Monitor系统
@@ -273,8 +271,64 @@ Etcd分布式锁由于gc时间过长导致续期失败，进而HA切换
 2. 吞吐优先还是延迟优先(-XX:MaxGCPauseMillis)
 3. 避免创建过多临时对象
 --------------
-#### 5. 如何避免创建过多的临时对象
 
+#### 5. 如何避免创建过多的临时对象
+##### ThreadLocal与池化
+
+```java  
+ThreadLocal<byte[]> BUFFER = ThreadLocal.withInitial(
+       () -> new byte[8192]);
+
+public void marshal(Object object, DataOutput out) {
+    int length = serializedSize(object);
+    byte[] buffer = length > 8192 ? new byte[length] : BUFFER.get();
+    serialized(object, buffer);
+    out.write(buffer, 0, length);
+}
+```
 --------------
+针对 `BUFFER.get();` 的性能损耗，扩展ThreadFactory与Thread, 实现FastThreadLocal
+
+```
+FastThreadLocal<byte[]> BUFFER = FastThreadLocal.withInitial(
+       () -> new byte[8192]);
+```
+--------------
+
+##### 利用堆外内存
+```java  
+sun.misc.Unsafe.allocateMemory(size);
+sun.misc.Unsafe.freeMemory(addr);
+sun.misc.Unsafe.reallocateMemory(addr, size);
+sun.misc.Unsafe.putByte(object, addr, value);
+sun.misc.Unsafe.getByte(addr);
+```
+--------------
+
+##### 通过JNI实现一套分配回收内存碎片更小的堆外内存库
+
+````java  
+public class Jemalloc {
+    static {
+        LibraryLoader.load("jemalloc");
+    }
+    public static native Stats je_stats_info();
+    public static native void je_free(long ptr);
+    public static native long je_malloc(long size);
+    public static native long je_calloc(long num, long size);
+    public static native long je_realloc(long ptr, long size);
+    public static native long je_aligned_alloc(long align, long size);
+    public static class Stats {
+        public long allocated, resident, metadata;
+        public long retained, mapped, active, epoch;
+    }
+}
+
+````
+--------------
+
+##### zero-copy
+--------------
+
 #### 6. 设计lock free架构与异步编程
 --------------

@@ -328,7 +328,61 @@ public class Jemalloc {
 --------------
 
 ##### zero-copy
+
+```java  
+ByteBuffer.allocate(1024);
+ByteBuffer.allocateDirect(1024);
+
+ByteBuffer.slice();
+ByteBuffer.flip();
+ByteBuffer.compact();
+ByteBuffer.rewind();
+ByteBuffer.duplicate();
+```
+
 --------------
 
 #### 6. 设计lock free架构与异步编程
+
+```
+
++---------+   shard  +---------------+           +----------+ 
+|         |--------->|thread process |---------->|          |
+|         |          +---------------+           |          |
+|         |                                      |          |
+|         |   shard  +---------------+           |          |
+| Request |--------->|thread process |---------->| RESPONSE |
+|         |          +---------------+           |          |
+|         |                                      |          |
+|         |   shard  +---------------+           |          |
+|         |--------->|thread process |---------->|          |
++---------+          +---------------+           +----------+ 
+
+```
+--------------
+##### 灵活使用CountDownLatch处理不可shard的请求
+
+```java  
+CountDownLatch latch = new CountDownLatch(shard);
+Request request = new Request(latch);
+submitToThreadPool(request);
+latch.await();
+//do some other process
+```
+--------------
+##### 灵活使用AtomicInteger处理不可shard的请求
+
+```java  
+AtomicInteger count = new AtomicInteger(shard);
+Request request = new Request(count);
+submitToThreadPool(request);
+
+public void process(Request request) {
+    Response res = ...
+    request.addResponse(res);
+    if(request.count.decrementAndGet() == 0) {
+        reply(request.getResponses());
+    }
+}
+```
 --------------

@@ -29,7 +29,7 @@ in programming.
 --------------
 
 #### 3. 性能优化的边际效益递减原则
-![w:700 h:600](https://github.com/leonchen83/share/blob/master/java/optimize-profit.jpg?raw=true)  
+![w:700 h:600](https://github.com/leonchen83/share/blob/master/java/optimize-profit.png?raw=true)  
 
 --------------
 

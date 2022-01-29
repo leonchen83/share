@@ -24,7 +24,7 @@ OS name: "windows 7", version: "6.1", arch: "amd64", family: "windows"
   
 ## step 3: 升级maven的compiler插件到3.8.1
   
-## step 4: 把一些不支持的api导出成ALL-UNNAMED, 把source和target标签替换成release标签并改成11
+## step 4: 把一些不支持的api导出成ALL-UNNAMED, 把source和target标签替改成11
   
 ```xml  
 
@@ -39,7 +39,8 @@ OS name: "windows 7", version: "6.1", arch: "amd64", family: "windows"
                     <arg>--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED</arg>
                     <arg>--add-exports=jdk.unsupported/sun.misc=ALL-UNNAMED</arg>
                 </compilerArgs>
-                <release>11</release>
+                <source>11</source>
+                <target>11</target>
             </configuration>
         </plugin>
     </plugins>

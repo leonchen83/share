@@ -11,7 +11,7 @@ Unsafe.getObjectAcquire 替换为 Unsafe.getReferenceAcquire
 Unsafe.compareAndSetObject 替换为 Unsafe.compareAndSetReference
 ```
 
-## step 2: 检查maven版本, maven版本升级到3.8.0或以上, 要求maven依赖的jdk也升级到17
+## step 2: 检查maven版本和java版本
 
 `mvn -version`
 
@@ -23,9 +23,9 @@ Default locale: zh_CN, platform encoding: UTF-8
 OS name: "windows 10", version: "10.0", arch: "amd64", family: "windows"
 ```
 
-## step 3: 升级maven的compiler插件到3.10.1
+## step 3: 升级maven的compiler插件
 
-## step 4: 把一些不支持的api导出成ALL-UNNAMED, 把source和target标签替改成17, 并加入-parameters参数
+* 把一些不支持的api导出成ALL-UNNAMED, 把source和target标签替改成17, 并加入-parameters参数
 
 ```xml  
 
@@ -49,7 +49,7 @@ OS name: "windows 10", version: "10.0", arch: "amd64", family: "windows"
     </plugins>
 ```
 
-## step 5: 升级spring, spring-boot, spring-batch, mybatis-spring, slf4j, logback, jetty版本
+## step 4: 升级相关的第三方版本
 
 ```
 spring upgrade to 6.0.3
@@ -113,7 +113,7 @@ logback upgrade to 1.4.5
             </dependency>
 ```
 
-## step 6: 字节码工具升级
+## step 5: 字节码工具升级
 
 ```xml  
             <dependency>
@@ -163,7 +163,7 @@ logback upgrade to 1.4.5
             </dependency>
 ```
 
-## step 7: 升级jakarta版本
+## step 6: 升级jakarta版本
 
 ```xml  
             <!-- jakarta -->
@@ -199,7 +199,7 @@ logback upgrade to 1.4.5
             </dependency>
 ```
 
-## step 8: 将javax名空间替换成jakarta名空间
+## step 7: 将javax名空间替换成jakarta名空间
 
 ```
 javax.validation 替换成jakarta.validation
@@ -208,7 +208,7 @@ javax.persistence 替换成jakarta.persistence
 javax.servlet 替换成jakarta.servlet
 ```
 
-## step 9: 修改logback配置文件
+## step 8: 修改logback配置文件
 
 ```xml  
 <!-- logback 1.4.5不允许在root, logger, appender标签内嵌套if 下面是错误示范 -->
@@ -228,7 +228,7 @@ javax.servlet 替换成jakarta.servlet
 </if>
 ```
 
-## step 10: 关于Spring Multipart配置的更改
+## step 9: 关于Spring Multipart配置的更改
 
 ```xml
 <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
@@ -248,7 +248,7 @@ javax.servlet 替换成jakarta.servlet
 
 spring boot 3中使用`MultipartAutoConfiguration`开启Multipart，并在`application.properties`中配置`spring.servlet.multipart.location`等参数
 
-## step 11: 关于spring batch的变更
+## step 10: 关于spring batch的变更
 
 * 表结构变更
 ```sql
@@ -285,7 +285,7 @@ ALTER TABLE BATCH_JOB_EXECUTION_PARAMS CHANGE COLUMN STRING_VAL PARAMETER_VALUE 
 5.0之后变为参数空格分割，key,value等号分割，我认为是个bug并提了issue。
 ```
 
-## step 12: 启动参数
+## step 11: 启动参数
 ```
 如果是用了jdk.internal.misc.SharedSecrets等内部类，那么运行时需要额外添加
 --add-opens=java.base/jdk.internal.access=ALL-UNNAMED, 其他参数参照migrate-to-java11.md

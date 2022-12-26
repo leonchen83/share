@@ -292,7 +292,7 @@ ALTER TABLE BATCH_JOB_EXECUTION_PARAMS CHANGE COLUMN STRING_VAL PARAMETER_VALUE 
 
 -XX:BiasedLockingStartupDelay=500被废弃，请从启动参数中删除
 
---illegal-access的默认级别改为了deny, 如果想和java11行为一致请添加--illegal-access=warn
+--illegal-access的默认级别改为了deny, 所以一定要把所有用的--add-opens和--add-exports添加到命令行
 ```
 
 # References

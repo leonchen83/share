@@ -53,7 +53,7 @@ OS name: "windows 10", version: "10.0", arch: "amd64", family: "windows"
 
 ```
 spring upgrade to 6.0.3
-spring-boot upgrade to 3.0.0
+spring-boot upgrade to 3.0.1
 spring-batch upgrade to 5.0.0
 mybatis-spring upgrade to 3.0.1
 jetty upgrade to 11.0.13
@@ -90,12 +90,12 @@ logback upgrade to 1.4.5
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter</artifactId>
-                <version>3.0.0</version>
+                <version>3.0.1</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
-                <version>3.0.0</version>
+                <version>3.0.1</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -154,12 +154,12 @@ logback upgrade to 1.4.5
             <dependency>
                 <groupId>org.aspectj</groupId>
                 <artifactId>aspectjrt</artifactId>
-                <version>1.9.9.1</version>
+                <version>1.9.19</version>
             </dependency>
             <dependency>
                 <groupId>org.aspectj</groupId>
                 <artifactId>aspectjweaver</artifactId>
-                <version>1.9.9.1</version>
+                <version>1.9.19</version>
             </dependency>
 ```
 
@@ -293,6 +293,38 @@ ALTER TABLE BATCH_JOB_EXECUTION_PARAMS CHANGE COLUMN STRING_VAL PARAMETER_VALUE 
 -XX:BiasedLockingStartupDelay=500被废弃，请从启动参数中删除
 
 --illegal-access的默认级别改为了deny, 所以一定要把所有用的--add-opens和--add-exports添加到命令行
+```
+
+## step 12: 关于maven surefire插件跑测试用例
+
+需要添加step11相关的导出参数到argLine里
+
+```xml  
+
+            <plugin>
+                <version>3.0.0-M7</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>
+                        --add-opens=java.base/java.nio=ALL-UNNAMED
+                        --add-opens=java.base/java.lang=ALL-UNNAMED
+                        --add-opens=java.base/java.math=ALL-UNNAMED
+                        --add-opens=java.base/sun.nio.ch=ALL-UNNAMED
+                        --add-opens=jdk.unsupported/sun.misc=ALL-UNNAMED
+                        --add-opens=java.base/java.lang.invoke=ALL-UNNAMED
+                        --add-opens=java.base/jdk.internal.ref=ALL-UNNAMED
+                        --add-opens=java.base/jdk.internal.misc=ALL-UNNAMED
+                        --add-opens=java.base/sun.security.util=ALL-UNNAMED
+                        --add-opens=java.base/sun.security.x509=ALL-UNNAMED
+                        --add-opens=java.base/jdk.internal.access=ALL-UNNAMED
+                        --add-opens=java.xml/com.sun.org.apache.xpath.internal=ALL-UNNAMED
+                        --add-opens=java.xml/com.sun.org.apache.xml.internal.utils=ALL-UNNAMED
+                        --add-opens=java.xml/com.sun.org.apache.xpath.internal.objects=ALL-UNNAMED
+                    </argLine>
+                </configuration>
+            </plugin>
+
 ```
 
 # References

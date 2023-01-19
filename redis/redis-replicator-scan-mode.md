@@ -24,7 +24,7 @@ for db in db0 - db16
         for key in keys
             let ttl = PTTL key
             let val = DUMP key
-            handle(ttl, value)
+            handle(ttl, val)
 ```
 
 ### 3. 设计遇到的问题
@@ -61,7 +61,7 @@ for db in db0 - db16
         for key in keys
             let ttl = PTTL key
             let val = DUMP key
-            handle(ttl, value)
+            handle(ttl, val)
         PIPELINE end
 ```
 

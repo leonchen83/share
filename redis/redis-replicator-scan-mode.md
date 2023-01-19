@@ -55,34 +55,35 @@ for db in db0 - db16
 #### 4.2 使用pipeline增加吞吐量
 
 ```
-    while cursor not 0
-        let keys = SCAN cursor COUNT 512
-        PIPELINE start
-        for key in keys
-            let ttl = PTTL key
-            let val = DUMP key
-            handle(ttl, val)
-        PIPELINE end
+while cursor not 0
+    let keys = SCAN cursor COUNT 512
+    PIPELINE start
+    for key in keys
+        let ttl = PTTL key
+        let val = DUMP key
+        handle(ttl, val)
+    PIPELINE end
 ```
 
 #### 4.3 设计一个响应回调的简易客户端避免pipeline中OOM
 
 ```java  
-    // pipeline
-    RESP2.Response r = client.newCommand();
-    r.post(pttl -> { /* handle pttl */ }, "pttl", key);
-    r.post(dump -> { /* handle dump */ }, "dump", key);
-    r.get();
+// pipeline
+RESP2.Response r = client.newCommand();
+r.post(pttl -> { /* handle pttl */ }, "pttl", key);
+r.post(dump -> { /* handle dump */ }, "dump", key);
+r.get();
 ```
 
 #### 4.4 重放失败的请求保证容错
 
 ```java
-    public RESP2.Response post(NodeConsumer handler, byte[]... command) throws IOException {
-        this.resp2.emit(command);
-        this.responses.offer(Tuples.of(handler, command));
-        return this;
-    }
+public RESP2.Response post(NodeConsumer handler, byte[]... command) 
+throws IOException {
+    this.resp2.emit(command);
+    this.responses.offer(Tuples.of(handler, command));
+    return this;
+}
 ```
 
 `this.responses.offer(Tuples.of(handler, command));` 在发送`post`请求时同时保存`handler`与`command`，以便在异常时重放此命令
@@ -95,61 +96,65 @@ for db in db0 - db16
 
 示例1：使用`SCAN`模式接收数据
 ```java  
-        Replicator r = new RedisReplicator("redis://127.0.0.1:6379?enableScan=yes&scanStep=128");
-        r.addEventListener(new EventListener() {
-            @Override
-            public void onEvent(Replicator replicator, Event event) {
-                System.out.println(event);
-            }
-        });
-        
-        r.open();
+String url = "redis://127.0.0.1:6379?enableScan=yes&scanStep=128";
+Replicator r = new RedisReplicator(url);
+r.addEventListener(new EventListener() {
+    @Override
+    public void onEvent(Replicator replicator, Event event) {
+        System.out.println(event);
+    }
+});
+
+r.open();
 ```
 
 示例2：使用`SCAN`模式将数据保存成`rdb`格式
 ```java
-        OutputStream out = new BufferedOutputStream(new FileOutputStream(new File("./dump.rdb")));
-        RawByteListener listener = new RawByteListener() {
-            @Override
-            public void handle(byte... rawBytes) {
-                try {
-                    out.write(rawBytes);
-                } catch (IOException ignore) {
-                }
-            }
-        };
+OutputStream fout = new FileOutputStream(new File("./dump.rdb"));
+OutputStream out = new BufferedOutputStream(fout);
+RawByteListener listener = new RawByteListener() {
+    @Override
+    public void handle(byte... rawBytes) {
+        try {
+            out.write(rawBytes);
+        } catch (IOException ignore) {
+        }
+    }
+};
     
-        //save rdb from remote server
-        Replicator r = new RedisReplicator("redis://127.0.0.1:6379?enableScan=yes&scanStep=512");
-        r.setRdbVisitor(new SkipRdbVisitor(r));
-        r.addEventListener(new EventListener() {
-            @Override
-            public void onEvent(Replicator replicator, Event event) {
-                if (event instanceof PreRdbSyncEvent) {
-                    replicator.addRawByteListener(listener);
-                }
-                if (event instanceof PostRdbSyncEvent) {
-                    replicator.removeRawByteListener(listener);
-                    try {
-                        out.close();
-                        replicator.close();
-                    } catch (IOException ignore) {
-                    }
-                }
+//save rdb from remote server
+String url = "redis://127.0.0.1:6379?enableScan=yes&scanStep=512";
+Replicator r = new RedisReplicator(url);
+r.setRdbVisitor(new SkipRdbVisitor(r));
+r.addEventListener(new EventListener() {
+    @Override
+    public void onEvent(Replicator replicator, Event event) {
+        if (event instanceof PreRdbSyncEvent) {
+            replicator.addRawByteListener(listener);
+        }
+        if (event instanceof PostRdbSyncEvent) {
+            replicator.removeRawByteListener(listener);
+            try {
+                out.close();
+                replicator.close();
+            } catch (IOException ignore) {
             }
-        });
-        
-        r.open();
+        }
+    }
+});
+
+r.open();
     
-        //check rdb file
-        r = new RedisRdbReplicator(new File("./dump.rdb"), Configuration.defaultSetting());
-        r.addEventListener(new EventListener() {
-            @Override
-            public void onEvent(Replicator replicator, Event event) {
-                System.out.println(event);
-            }
-        });
-        r.open();
+//check rdb file
+Configuration conf = Configuration.defaultSetting();
+r = new RedisRdbReplicator(new File("./dump.rdb"), conf);
+r.addEventListener(new EventListener() {
+    @Override
+    public void onEvent(Replicator replicator, Event event) {
+        System.out.println(event);
+    }
+});
+r.open();
 ```
 
 通过如上示例我们发现，`SCAN`模式与`PSYNC`模式的唯一区别就是`redis url`中增加了参数`enableScan=yes&scanStep=512`

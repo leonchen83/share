@@ -13,18 +13,19 @@ A : 暂时没有计划支持Tendis等内存数据库
 
 ### 2. SCAN模式的设计构想
 
-在`redis-replicator-3.7.0`这个版本，添加了一个`SCAN`模式，在上述命令被禁用的情况下通过`SCAN`命令来扫描全库解析成相对应的`Event`。其关键伪代码实现如下
+在`redis-replicator` `3.7.0`这个版本，添加了一个`SCAN`模式，在上述命令被禁用的情况下通过`SCAN`命令来扫描全库解析成相对应的`Event`。其关键伪代码实现如下
 
 ```
 for db in db0 - db16
     SELECT db
     
-    while cursor not 0
-        let keys = SCAN cursor COUNT 512
+    while cursor != 0
+        let keys = (SCAN cursor COUNT 512)
         for key in keys
             let ttl = PTTL key
             let val = DUMP key
-            handle(ttl, val)
+            let rdbStream = convertToRdbStream(ttl, val)
+            handle(rdbStream)
 ```
 
 ### 3. 设计遇到的问题
@@ -61,7 +62,8 @@ while cursor not 0
     for key in keys
         let ttl = PTTL key
         let val = DUMP key
-        handle(ttl, val)
+        let rdbStream = convertToRdbStream(ttl, val)
+        handle(rdbStream)
     PIPELINE end
 ```
 
@@ -69,7 +71,7 @@ while cursor not 0
 
 ```java  
 // pipeline
-RESP2.Response r = client.newCommand();
+RESP2.Command r = client.newCommand();
 r.post(pttl -> { /* handle pttl */ }, "pttl", key);
 r.post(dump -> { /* handle dump */ }, "dump", key);
 r.get();
@@ -78,15 +80,15 @@ r.get();
 #### 4.4 重放失败的请求保证容错
 
 ```java
-public RESP2.Response post(NodeConsumer handler, byte[]... command) 
+public RESP2.Command post(NodeConsumer handler, byte[]... command) 
 throws IOException {
     this.resp2.emit(command);
-    this.responses.offer(Tuples.of(handler, command));
+    this.commands.offer(Tuples.of(handler, command));
     return this;
 }
 ```
 
-`this.responses.offer(Tuples.of(handler, command));` 在发送`post`请求时同时保存`handler`与`command`，以便在异常时重放此命令
+`this.commands.offer(Tuples.of(handler, command));` 在发送`post`请求时同时保存`handler`与`command`，以便在异常时重放此命令
 
 ### 5. 已知问题
 
@@ -144,17 +146,21 @@ r.addEventListener(new EventListener() {
 });
 
 r.open();
-    
-//check rdb file
-Configuration conf = Configuration.defaultSetting();
-r = new RedisRdbReplicator(new File("./dump.rdb"), conf);
-r.addEventListener(new EventListener() {
-    @Override
-    public void onEvent(Replicator replicator, Event event) {
-        System.out.println(event);
-    }
-});
-r.open();
 ```
 
 通过如上示例我们发现，`SCAN`模式与`PSYNC`模式的唯一区别就是`redis url`中增加了参数`enableScan=yes&scanStep=512`
+
+### 7. 在Redis-Rdb-CLI中使用SCAN模式
+
+```
+# step 1: 安装
+$ wget https://github.com/leonchen83/redis-rdb-cli/releases/download/v0.9.3/redis-rdb-cli-release.zip
+$ unzip redis-rdb-cli-release.zip
+$ cd ./redis-rdb-cli
+
+# step 2: 将 enable_scan=false 改为 true
+$ sed -i 's/enable_scan=false/enable_scan=true/g' ./conf/redis-rdb-cli.conf
+
+# step 3: 执行迁移命令
+$ ./bin/rmt -s redis://127.0.0.1:6379 -m redis://127.0.0.1:6380 -r
+```

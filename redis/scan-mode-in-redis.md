@@ -92,7 +92,7 @@ throws IOException {
 
 ### 5. 已知问题
 
-实现`SCAN`模式后，和`PSYNC`模式在`API`层面只有一处不一致：即`redis-replicator`会在`SCAN`完全库之后终止，`PSYNC`模式还会在后续接收增量命令。
+实现`SCAN`模式后，和`PSYNC`模式在`API`层面只有一处不一致：即`redis-replicator`会在`SCAN`完整个数据库之后终止，`PSYNC`模式还会在后续接收增量命令。
 
 ### 6. 使用示例
 

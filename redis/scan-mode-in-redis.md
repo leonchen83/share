@@ -24,8 +24,7 @@ for db in db0 - db16
         for key in keys
             let ttl = PTTL key
             let val = DUMP key
-            let rdbStream = convertToRdbStream(ttl, val)
-            handle(rdbStream)
+            handle(ttl, val)
 ```
 
 ### 3. 设计遇到的问题
@@ -53,6 +52,15 @@ for db in db0 - db16
 
 由于上面提到的兼容性问题，我们在实现时采取了不直接解析`DUMP`和`TTL`流，而是将上述结果重新组装成一个`rdb`流，这样就完全保证了兼容性。
 
+```
+while cursor not 0
+    let keys = SCAN cursor COUNT 512
+    for key in keys
+        let ttl = PTTL key
+        let val = DUMP key
+        let rdbStream = convertToRdbStream(ttl, val)
+        handle(rdbStream)
+```
 #### 4.2 使用pipeline增加吞吐量
 
 ```

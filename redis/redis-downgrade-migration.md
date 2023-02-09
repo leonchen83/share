@@ -90,7 +90,7 @@ replicator.setRdbVisitor(new DumpRdbVisitor(replicator, 9));
 ```
 
 ```java  
-// 注册事件监听器, 这里得到的serialized数据就是降级成rdbv9的数组
+// 注册事件监听器, 这里的serialized就是降级成rdbv9的byte数组
 // 可以直接使用RESTORE命令迁移到目标库
 replicator.addEventListener(new EventListener() {
     @Override

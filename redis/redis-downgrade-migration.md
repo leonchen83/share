@@ -107,7 +107,7 @@ replicator.addEventListener(new EventListener() {
 
 ```shell
 # Redis-rdb-CLI内部实现是依赖Redis-replicator的
-# 迁移的第一步即使改配置文件/path/to/redis-rdb-cli/conf/redis-rdb-cli.conf
+# 迁移的第一步需要更改配置文件/path/to/redis-rdb-cli/conf/redis-rdb-cli.conf
 # 将dump_rdb_version从-1改到9
 $ sed -i 's/dump_rdb_version=-1/dump_rdb_version=9/g' /redis-rdb-cli/conf/redis-rdb-cli.conf
 

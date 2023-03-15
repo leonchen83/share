@@ -52,12 +52,12 @@ OS name: "windows 10", version: "10.0", arch: "amd64", family: "windows"
 ## step 4: 升级相关的第三方版本
 
 ```
-spring upgrade to 6.0.3
-spring-boot upgrade to 3.0.1
-spring-batch upgrade to 5.0.0
+spring upgrade to 6.0.6
+spring-boot upgrade to 3.0.4
+spring-batch upgrade to 5.0.1
 mybatis-spring upgrade to 3.0.1
-jetty upgrade to 11.0.13
-slf4j-api upgrade to 2.0.5
+jetty upgrade to 11.0.14
+slf4j-api upgrade to 2.0.6
 logback upgrade to 1.4.5
 ```
 
@@ -85,29 +85,29 @@ logback upgrade to 1.4.5
             <dependency>
                 <groupId>org.springframework.batch</groupId>
                 <artifactId>spring-batch-core</artifactId>
-                <version>5.0.0</version>
+                <version>5.0.1</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter</artifactId>
-                <version>3.0.1</version>
+                <version>3.0.4</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
-                <version>3.0.1</version>
+                <version>3.0.4</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-framework-bom</artifactId>
-                <version>6.0.3</version>
+                <version>6.0.6</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-bom</artifactId>
-                <version>11.0.13</version>
+                <version>11.0.14</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -279,10 +279,12 @@ ALTER TABLE BATCH_JOB_EXECUTION_PARAMS CHANGE COLUMN STRING_VAL PARAMETER_VALUE 
     </bean>
 ```
 
-* SimpleJobOperator.start(String jobName, String parameters)启动参数变更
-```
-这个parameters之前的格式是参数逗号分割，key,value用等号分割
-5.0之后变为参数空格分割，key,value等号分割，我认为是个bug并提了issue。
+```java
+// 这个方法被废弃了
+SimpleJobOperator.start(String jobName, String parameters)
+        
+// 替换为
+SimpleJobOperator.start(String jobName, Properties parameters)
 ```
 
 ## step 11: 启动参数

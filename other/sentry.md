@@ -9,7 +9,7 @@ cd self-hosted
 git checkout ${VERSION}
 sudo ./install.sh
 
-
+docker-compose up -d
 ```
 
 # 2. 各模块简介
@@ -91,10 +91,19 @@ graphite
 rabbitmq
 ```
 
-# 3. 事件处理流程
+# 3. 架构以及事件处理流程
+
+![架构](sentry.png)
+
+[event ingest graph](https://getsentry.github.io/event-ingestion-graph/)
 
 # 4. 配置项以及监控
 
 # 5. 调优
 
 # 6. 扩容
+
+# references
+
+* [event ingestion graph](https://getsentry.github.io/event-ingestion-graph/)
+* [浅析Sentry 架构设计](https://juejin.cn/post/7139006619043495973)

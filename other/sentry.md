@@ -3,7 +3,7 @@
 # 1. 安装与启动
 
 ```
-export VERSION="24.1.0"
+export VERSION="24.4.0"
 git clone https://github.com/getsentry/self-hosted.git
 cd self-hosted
 git checkout ${VERSION}

@@ -348,7 +348,11 @@ HEALTHCHECK_RETRIES=5
 
 ![nodestore](./nodestore-save.png)
 
-# 6. references
+# 7 调整后的sentry容器情况
+
+![sentry-after](./sentry-after.png)
+
+# 8. references
 
 * [event ingestion graph](https://getsentry.github.io/event-ingestion-graph/)
 * [浅析Sentry 架构设计](https://juejin.cn/post/7139006619043495973)

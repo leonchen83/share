@@ -3,10 +3,9 @@
 # 1. 安装与启动
 
 ```
-export VERSION="24.4.0"
-git clone https://github.com/getsentry/self-hosted.git
-cd self-hosted
-git checkout ${VERSION}
+wget https://github.com/getsentry/self-hosted/archive/refs/tags/24.4.0.tar.gz
+tar -xvf 24.4.0.tar.gz
+cd ./self-hosted-24.4.0
 sudo ./install.sh
 
 docker-compose up -d
@@ -309,7 +308,7 @@ ingest-consumer ingest-transactions 0          -               0               -
 
 ```yml
   worker-1:
-    command: run worker -c 1 -X events.process_event,events.save_event,events.symbolicate_event,post_process_errors -l ERROR
+    command: run worker -c 2 -X events.process_event,events.save_event,events.symbolicate_event,post_process_errors -l ERROR
   worker-2:
     command: run worker -c 8 -Q events.process_event,events.save_event,events.symbolicate_event,post_process_errors -l ERROR
   worker-3:
@@ -320,7 +319,29 @@ ingest-consumer ingest-transactions 0          -               0               -
 
 ![monitor](./monitor.png)
 
-### 6.4 数据存储瓶颈的可能原因
+### 6.4 post consumer调整
+
+将不稳定的rust-consumer替换为python consumer
+```yml
+  post-process-forwarder-errors:
+    command: run consumer post-process-forwarder-errors --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-commit-log --synchronize-commit-group=snuba-consumers --no-strict-offset-reset
+  post-process-forwarder-transactions:
+    command: run consumer post-process-forwarder-transactions --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-transactions-commit-log --synchronize-commit-group transactions_group --no-strict-offset-reset 
+  post-process-forwarder-issue-platform:
+    command: run consumer post-process-forwarder-issue-platform --consumer-group post-process-forwarder --synchronize-commit-log-topic=snuba-generic-events-commit-log --synchronize-commit-group generic_events_group --no-strict-offset-reset
+```
+
+### 6.5 设置容器的health check间隔
+
+配置项位置：`/path/to/self-hosted/.env`
+
+```agsl
+HEALTHCHECK_INTERVAL=30s
+HEALTHCHECK_TIMEOUT=30s
+HEALTHCHECK_RETRIES=5
+```
+
+### 6.6 数据存储瓶颈的可能原因
 
 1. 在save的时候没有采用batch处理
 2. redis在读取数据的时候没有采用pipeline

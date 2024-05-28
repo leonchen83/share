@@ -283,10 +283,8 @@ ingest-consumer ingest-transactions 0          -               0               -
 ```yml
   events-consumer-1:
     command: run consumer ingest-events --consumer-group ingest-consumer
-    hostname: events-consumer 
   events-consumer-2:
     command: run consumer ingest-events --consumer-group ingest-consumer
-    hostname: events-consumer
 ```
 
 修改后

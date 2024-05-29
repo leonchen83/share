@@ -354,3 +354,4 @@ HEALTHCHECK_RETRIES=5
 
 * [event ingestion graph](https://getsentry.github.io/event-ingestion-graph/)
 * [浅析Sentry 架构设计](https://juejin.cn/post/7139006619043495973)
+* [self-hosted trouble shooting](https://develop.sentry.dev/self-hosted/troubleshooting/)

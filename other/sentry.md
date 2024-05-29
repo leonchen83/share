@@ -74,7 +74,7 @@ sentry-self-hosted-zookeeper-1
 sentry-self-hosted-symbolicator-1
 sentry-self-hosted-redis-1
 sentry-self-hosted-memcached-1
-sentry-self-hosted-vroom-1
+sentry-self-hosted-vroom-1  #profiling service
 
 # 定期清理数据
 

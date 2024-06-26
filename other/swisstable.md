@@ -159,7 +159,7 @@ func void remove(Object key)
             if keyGroup(i)[p] equals key
             
                 keyGroup(i)[p] = nil
-                keyGroup(i)[p] = nil
+                valGroup(i)[p] = nil
                 
                 if len(matchEmpty(i)) > 0
                     // deleted

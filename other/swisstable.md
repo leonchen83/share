@@ -41,7 +41,7 @@ static class Node<K,V> implements Map.Entry<K,V> {
 
 ### 2.1 matchH2 函数
 
-```
+```python
 func int[] matchH2(int g, byte h2)
     result = []
     byte[] meta = meta(g)
@@ -55,7 +55,7 @@ func int[] matchH2(int g, byte h2)
 
 ### 2.2 matchEmpty 函数
 
-```
+```python
 byte EMPTY = -128
 
 func int[] matchEmpty(int g)
@@ -73,7 +73,7 @@ func int[] matchEmpty(int g)
 
 ### 3.1 put方法
 
-```
+```python
 func void put(Object key, Object val)
     long hash = hash(key)
     
@@ -108,7 +108,7 @@ func void put(Object key, Object val)
 
 ### 3.2 get方法
 
-```
+```python
 func Object get(Object key)
     long hash = hash(key)
     
@@ -139,7 +139,7 @@ func Object get(Object key)
 
 ### 3.3 remove方法
 
-```
+```python
 byte EMPTY = -128
 byte TOMBSTONE = -2
 
@@ -184,12 +184,12 @@ func void remove(Object key)
 
 ### 3.4 resize
 
-```
+```python
 func int size()
     return size - dead
 ```
 
-```
+```python
 func boolean resize() 
     if size < totalsize * 0.75
         return false
@@ -215,7 +215,7 @@ func boolean resize()
 
 改写`put`方法
 
-```
+```python
 func void put(Object key, Object val)
     long hash = hash(key)
     
@@ -250,7 +250,7 @@ func void put(Object key, Object val)
             i = 0
 ```
 
-```
+```python
 func void add(Object key, Object val, long h1, byte h2)
     int g = h1 % groups.length
     

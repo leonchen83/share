@@ -84,20 +84,21 @@ func void put(Object key, Object val)
     
     for i = g; i < groups.length;
         
-        int[] matches = matchH2(g, h2)
+        int[] matches = matchH2(i, h2)
         
         for p in matches
-            if keyGroup(g)[p] equals key
+            if keyGroup(i)[p] equals key
                 // replace
-                valGroup(g)[p] = value
+                valGroup(i)[p] = value
                 return
         
-        matches = matchEmpty(g)
+        matches = matchEmpty(i)
         for p in matches
             // add
-            meta(g)[p] = h2
-            keyGroup(g)[p] = key
-            valGroup(g)[p] = val
+            meta(i)[p] = h2
+            keyGroup(i)[p] = key
+            valGroup(i)[p] = val
+            size++
             return
         
         i++
@@ -108,7 +109,7 @@ func void put(Object key, Object val)
 ### 3.2 get方法
 
 ```
-func void get(Object key)
+func Object get(Object key)
     long hash = hash(key)
     
     long h1 = hi57(hash)
@@ -118,14 +119,14 @@ func void get(Object key)
     
     for i = g; i < groups.length;
         
-        int[] matches = matchH2(g, h2)
+        int[] matches = matchH2(i, h2)
         
         for p in matches
-            if keyGroup(g)[p] equals key
-                Object val = valGroup(g)[p]
+            if keyGroup(i)[p] equals key
+                Object val = valGroup(i)[p]
                 return val
         
-        matches = matchEmpty(g)
+        matches = matchEmpty(i)
         
         // fast path
         if len(matches) > 0
@@ -139,6 +140,9 @@ func void get(Object key)
 ### 3.3 remove方法
 
 ```
+byte EMPTY = -128
+byte TOMBSTONE = -2
+
 func void remove(Object key)
     long hash = hash(key)
     
@@ -149,25 +153,27 @@ func void remove(Object key)
     
     for i = g; i < groups.length;
     
-        int[] matches = matchH2(g, h2)
+        int[] matches = matchH2(i, h2)
         
         for p in matches
-            if keyGroup(g)[p] equals key
+            if keyGroup(i)[p] equals key
             
-                keyGroup(g)[p] = nil
-                keyGroup(g)[p] = nil
+                keyGroup(i)[p] = nil
+                keyGroup(i)[p] = nil
                 
-                if len(matchEmpty(g)) > 0
+                if len(matchEmpty(i)) > 0
                     // deleted
-                    meta(g)[p] = EMPTY
+                    meta(i)[p] = EMPTY
+                    size--
                 else
                     // mark deleted
-                    meta(g)[p] = TOMBSTONE
+                    meta(i)[p] = TOMBSTONE
+                    dead++
                 return
                     
-        matches = matchEmpty(g)
+        matches = matchEmpty(i)
         
-        if len(matchEmpty(g)) > 0
+        if len(matches) > 0
             // not found
             return
         
@@ -178,7 +184,90 @@ func void remove(Object key)
 
 ### 3.4 resize
 
-### 3.5 初始化
+```
+func int size()
+    return size - dead
+```
+
+```
+func boolean resize() 
+    if size < totalsize * 0.75
+        return false
+    
+    int next
+    if dead >= size / 2
+        next = groups.length
+    else
+        next = groups.length * 2
+    
+    Object[] prevkey = currentkeys
+    Object[] prevval = currentvals
+    
+    initMeta(next)
+    currentkeys = initKeyGroup(next)
+    currentvals = initValGroup(next)
+    
+    for key, val in prevkey, prevval
+        put(key, val)
+        
+    return true
+```
+
+改写`put`方法
+
+```
+func void put(Object key, Object val)
+    long hash = hash(key)
+    
+    long h1 = hi57(hash)
+    byte h2 = lo07(hash)
+    
+    int g = h1 % groups.length
+    
+    for i = g; i < groups.length;
+        
+        int[] matches = matchH2(i, h2)
+        
+        for p in matches
+            if keyGroup(i)[p] equals key
+                // replace
+                valGroup(i)[p] = value
+                return
+        
+        matches = matchEmpty(i)
+        for p in matches
+            if resize()
+                add(key, val, h1, h2)
+            else
+                meta(i)[p] = h2
+                keyGroup(i)[p] = key
+                valGroup(i)[p] = val
+                size++
+                return
+                
+        i++
+        if i >= groups.length
+            i = 0
+```
+
+```
+func void add(Object key, Object val, long h1, byte h2)
+    int g = h1 % groups.length
+    
+    for i = g; i < groups.length;
+    
+        int[] matches = matchEmpty(i)
+        
+        for p in matches
+            meta(i)[p] = h2
+            keyGroup(i)[p] = key
+            valGroup(i)[p] = val
+            size++
+        
+        i++
+        if i >= groups.length
+            i = 0
+```
 
 ## 4. SIMD简介
 

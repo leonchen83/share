@@ -1,6 +1,6 @@
-## Swiss Table
+# Swiss Table
 
-## HashMap的问题
+## 1.HashMap的问题
 
 Node节点占用的内存空间过大
 ```
@@ -35,15 +35,158 @@ static class Node<K,V> implements Map.Entry<K,V> {
 }
 ```
 
-## 
-
-## 实现
-
-## SIMD简介
+## 2.Swiss table 的结构
 
 
 
-## 优化
+### 2.1 matchH2 函数
+
+```
+func int[] matchH2(int g, byte h2)
+    result = []
+    byte[] meta = meta(g)
+    
+    for i = 0; i < meta.length; i++
+        if meta[i] == h2
+            result.append(i)
+
+    return result
+```
+
+### 2.2 matchEmpty 函数
+
+```
+byte EMPTY = -128
+
+func int[] matchEmpty(int g)
+    result = []
+    byte[] meta = meta(g)
+    
+    for i = 0; i < meta.length; i++
+        if meta[i] == EMPTY
+            result.append(i)
+
+    return result
+```
+
+## 3.Swiss table 的实现
+
+### 3.1 put方法
+
+```
+func void put(Object key, Object val)
+    long hash = hash(key)
+    
+    long h1 = hi57(hash)
+    byte h2 = lo07(hash)
+    
+    int g = h1 % groups.length
+    
+    for i = g; i < groups.length;
+        
+        int[] matches = matchH2(g, h2)
+        
+        for p in matches
+            if keyGroup(g)[p] equals key
+                // replace
+                valGroup(g)[p] = value
+                return
+        
+        matches = matchEmpty(g)
+        for p in matches
+            // add
+            meta(g)[p] = h2
+            keyGroup(g)[p] = key
+            valGroup(g)[p] = val
+            return
+        
+        i++
+        if i >= groups.length
+            i = 0
+```
+
+### 3.2 get方法
+
+```
+func void get(Object key)
+    long hash = hash(key)
+    
+    long h1 = hi57(hash)
+    byte h2 = lo07(hash)
+    
+    int g = h1 % groups.length
+    
+    for i = g; i < groups.length;
+        
+        int[] matches = matchH2(g, h2)
+        
+        for p in matches
+            if keyGroup(g)[p] equals key
+                Object val = valGroup(g)[p]
+                return val
+        
+        matches = matchEmpty(g)
+        
+        // fast path
+        if len(matches) > 0
+            return nil
+        
+        i++
+        if i >= groups.length
+            i = 0
+```
+
+### 3.3 remove方法
+
+```
+func void remove(Object key)
+    long hash = hash(key)
+    
+    long h1 = hi57(hash)
+    byte h2 = lo07(hash)
+    
+    int g = h1 % groups.length
+    
+    for i = g; i < groups.length;
+    
+        int[] matches = matchH2(g, h2)
+        
+        for p in matches
+            if keyGroup(g)[p] equals key
+            
+                keyGroup(g)[p] = nil
+                keyGroup(g)[p] = nil
+                
+                if len(matchEmpty(g)) > 0
+                    // deleted
+                    meta(g)[p] = EMPTY
+                else
+                    // mark deleted
+                    meta(g)[p] = TOMBSTONE
+                return
+                    
+        matches = matchEmpty(g)
+        
+        if len(matchEmpty(g)) > 0
+            // not found
+            return
+        
+        i++
+        if i >= groups.length
+            i = 0
+```
+
+### 3.4 resize
+
+### 3.5 初始化
+
+## 4. SIMD简介
+
+
+
+## 5. 优化
+
+### 5.1 SIMD优化
 
 使用SIMD优化matchH2与matchEmpty, 首先加入参数`--add-modules=jdk.incubator.vector` 与`--enable-preview` 开启Jdk的预览功能Vector
 
@@ -67,7 +210,7 @@ vpbroadcastb %xmm1,%ymm1
 vpcmpeqb %ymm1,%ymm0,%ymm0
 ```
 
-用位运算模拟SIMD
+### 5.2 位运算模拟SIMD
 
 ```java
 public static long LO_BITS = 0x0101010101010101L;
@@ -86,7 +229,7 @@ public long matchEmpty(int offset) {
 }
 ```
 
-## References
+## 6. References
 
 1. [Swiss Tables Design Notes](https://abseil.io/about/design/swisstables)
 2. [CppCon 2017: Matt Kulukundis “Designing a Fast, Efficient, Cache-friendly Hash Table, Step by Step”](https://www.youtube.com/watch?v=ncHmEUmJZf4&t=2496s)

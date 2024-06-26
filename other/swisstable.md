@@ -200,14 +200,14 @@ func boolean resize()
     else
         next = groups.length * 2
     
-    Object[] prevkey = currentkeys
-    Object[] prevval = currentvals
+    Object[] prevkeys = currentkeys
+    Object[] prevvals = currentvals
     
     initMeta(next)
     currentkeys = initKeyGroup(next)
     currentvals = initValGroup(next)
     
-    for key, val in prevkey, prevval
+    for key, val in prevkeys, prevvals
         put(key, val)
         
     return true

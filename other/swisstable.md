@@ -271,7 +271,21 @@ func void add(Object key, Object val, long h1, byte h2)
 
 ## 4. SIMD简介
 
+SIMD 全称叫做 single instruction multiple data 。现代 CPU 具有固定大小的 SIMD 寄存器：128 位（SSE）、256 位（AVX）或 512 位（AVX512）。现代台式机 CPU 的 SIMD 宽度通常为 256 位，高端服务器 CPU 的宽度为 512 位。嵌入式 CPU 的宽度大多为 128 位。
 
+![simd-sisd](./simd-sisd.png)
+
+### 4.1 SIMD的优势
+1. SIMD 几乎适用于所有 CPU。只有低端的嵌入式 CPU 才没有 SIMD
+2. SIMD 确实是执行并行化最便宜的方法。其他并行化技术（如多线程或GPU计算）都有“预热”成本。当输入较小时，启动线程或将数据复制到显卡的成本可能比进行实际计算的成本更高。
+
+```java
+for (int i = 0; i < n; i++) {
+    a[i] = b[i] + c[i];
+}
+```
+
+上述代码在JIT中会自动做SIMD优化
 
 ## 5. 优化
 
@@ -325,3 +339,4 @@ public long matchEmpty(int offset) {
 3. [Java SIMD](https://vksegfault.github.io/posts/java-simd/)
 4. [how-to-see-jit-compiled-code-in-jvm](https://stackoverflow.com/questions/1503479/how-to-see-jit-compiled-code-in-jvm#15146962)
 5. [hsdis download](https://chriswhocodes.com/hsdis/)
+6. [Crash course introduction to parallelism: SIMD Parallelism](https://johnnysswlab.com/crash-course-introduction-to-parallelism-simd-parallelism/)

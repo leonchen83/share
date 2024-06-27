@@ -129,7 +129,7 @@ func Object get(Object key)
         matches = matchEmpty(i)
         
         // fast path
-        if len(matches) > 0
+        if matches.length > 0
             return nil
         
         i++
@@ -161,7 +161,7 @@ func void remove(Object key)
                 keyGroup(i)[p] = nil
                 valGroup(i)[p] = nil
                 
-                if len(matchEmpty(i)) > 0
+                if matchEmpty(i).length > 0
                     // deleted
                     meta(i)[p] = EMPTY
                     size--
@@ -173,7 +173,7 @@ func void remove(Object key)
                     
         matches = matchEmpty(i)
         
-        if len(matches) > 0
+        if matches.length > 0
             // not found
             return
         
@@ -279,7 +279,7 @@ SIMD 全称叫做 single instruction multiple data 。现代 CPU 具有固定大
 1. SIMD 几乎适用于所有 CPU。只有低端的嵌入式 CPU 才没有 SIMD
 2. SIMD 确实是执行并行化最便宜的方法。其他并行化技术（如多线程或GPU计算）都有“预热”成本。当输入较小时，启动线程或将数据复制到显卡的成本可能比进行实际计算的成本更高。
 
-```java
+```
 for (int i = 0; i < n; i++) {
     a[i] = b[i] + c[i];
 }

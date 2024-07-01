@@ -37,14 +37,53 @@ static class Node<K,V> implements Map.Entry<K,V> {
 
 ## 2.Swiss table 的结构
 
+Swiss table属于open addressing hash的一个变种，所以是扁平化的，我们先初始化三个数组，meta数组中的每一个byte对应keys数组中的元素的三种状态 `key不存在`，`key存在`，`标记key删除`
 
-
-### 2.1 matchH2 函数
+### 2.1 初始化与分组
 
 ```python
-func int[] matchH2(int g, byte h2)
-    result = []
-    byte[] meta = meta(g)
+byte EMPTY = -128
+byte TOMBSTONE = -2
+
+byte[] meta = EMPTY.repeat(n)
+Object[] keys = nil.repeat(n)
+Object[] vals = nil.repeat(n)
+```
+
+对上述的数组进行分组，每8个元素一个分组
+
+```python
+func byte[] meta(int group)
+    return meta.slice(group * 8, 8)
+    
+func Object[] keyGroup(int group)
+    return keys.slice(group * 8, 8)
+    
+func Object[] valGroup(int group)
+    return vals.slice(group * 8, 8)
+```
+
+### 2.2 hash函数
+
+```
+func long hash(Object key)
+    return key.hashcode
+    
+func long hi57(long hash)
+    return (hash & 0xFFFFFFFFFFFFFF80L) >> 7
+    
+func byte lo07(long hash)
+    return cast(hash & 0x000000000000007FL, byte)
+```
+
+将hash拆分成两段，前57bit决定key在哪个group, 后7bit决定key在这个分组的哪一个位置
+
+### 2.3 matchH2 函数
+
+```python
+func int[] matchH2(int group, byte h2)
+    byte[] result = []
+    byte[] meta = meta(group)
     
     for i = 0; i < meta.length; i++
         if meta[i] == h2
@@ -53,14 +92,12 @@ func int[] matchH2(int g, byte h2)
     return result
 ```
 
-### 2.2 matchEmpty 函数
+### 2.4 matchEmpty 函数
 
 ```python
-byte EMPTY = -128
-
-func int[] matchEmpty(int g)
-    result = []
-    byte[] meta = meta(g)
+func int[] matchEmpty(int group)
+    byte[] result = []
+    byte[] meta = meta(group)
     
     for i = 0; i < meta.length; i++
         if meta[i] == EMPTY
@@ -106,6 +143,8 @@ func void put(Object key, Object val)
             i = 0
 ```
 
+
+
 ### 3.2 get方法
 
 ```python
@@ -140,9 +179,6 @@ func Object get(Object key)
 ### 3.3 remove方法
 
 ```python
-byte EMPTY = -128
-byte TOMBSTONE = -2
-
 func void remove(Object key)
     long hash = hash(key)
     
@@ -200,12 +236,12 @@ func boolean resize()
     else
         next = groups.length * 2
     
-    Object[] prevkeys = currentkeys
-    Object[] prevvals = currentvals
+    Object[] prevkeys = keys
+    Object[] prevvals = vals
     
     initMeta(next)
-    currentkeys = initKeyGroup(next)
-    currentvals = initValGroup(next)
+    keys = initKeyGroup(next)
+    vals = initValGroup(next)
     
     for key, val in prevkeys, prevvals
         put(key, val)

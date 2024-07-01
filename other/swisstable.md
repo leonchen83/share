@@ -67,7 +67,7 @@ func Object[] valGroup(int group)
 ### 2.2 hash函数
 
 ```python
-# 将hash拆分成两段，前57bit决定key在哪个group, 后7bit决定key在这个分组的哪一个位置
+# 将hash拆分成两段，前57bit决定key在哪个group, 后7bit决定key在这个group的哪一个位置
 
 func long hash(Object key)
     return key.hashcode
@@ -84,7 +84,7 @@ func byte lo07(long hash)
 ### 2.3 matchH2 函数
 
 ```python
-# 找到某一分组中所有等于低位7bit hash的位置
+# 找到某一group中所有等于低位7bit hash的位置
 
 func int[] matchH2(int group, byte h2)
     byte[] result = []
@@ -101,7 +101,7 @@ func int[] matchH2(int group, byte h2)
 
 ```python
 
-# 找到某一分组中所有空元素的位置
+# 找到某一group中所有空元素的位置
 
 func int[] matchEmpty(int group)
     byte[] result = []

@@ -50,9 +50,10 @@ Object[] keys = nil.repeat(n)
 Object[] vals = nil.repeat(n)
 ```
 
-对上述的数组进行分组，每8个元素一个分组
-
 ```python
+
+# 对上述的数组进行分组，每8个元素一个分组
+
 func byte[] meta(int group)
     return meta.slice(group * 8, 8)
     
@@ -65,7 +66,9 @@ func Object[] valGroup(int group)
 
 ### 2.2 hash函数
 
-```
+```python
+# 将hash拆分成两段，前57bit决定key在哪个group, 后7bit决定key在这个分组的哪一个位置
+
 func long hash(Object key)
     return key.hashcode
     
@@ -76,11 +79,13 @@ func byte lo07(long hash)
     return cast(hash & 0x000000000000007FL, byte)
 ```
 
-将hash拆分成两段，前57bit决定key在哪个group, 后7bit决定key在这个分组的哪一个位置
+
 
 ### 2.3 matchH2 函数
 
 ```python
+# 找到某一分组中所有等于低位7bit hash的位置
+
 func int[] matchH2(int group, byte h2)
     byte[] result = []
     byte[] meta = meta(group)
@@ -95,6 +100,9 @@ func int[] matchH2(int group, byte h2)
 ### 2.4 matchEmpty 函数
 
 ```python
+
+# 找到某一分组中所有空元素的位置
+
 func int[] matchEmpty(int group)
     byte[] result = []
     byte[] meta = meta(group)

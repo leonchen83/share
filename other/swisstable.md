@@ -151,7 +151,12 @@ func void put(Object key, Object val)
             i = 0
 ```
 
+#### 例1： put一个元素<key = d, group = 1, h2 = 24>
+![swiss1](./swiss1.png)
 
+在group1中没有找到该元素并且group1已满，所以到group2中继续寻找，没找到并且该组有空元素的情况下，插入第一个空的位置
+
+![swiss2](./swiss2.png)
 
 ### 3.2 get方法
 
@@ -183,6 +188,21 @@ func Object get(Object key)
         if i >= groups.length
             i = 0
 ```
+
+#### 例2: get一个元素<key = c, group = 2, h2 = 24>
+![swiss2](./swiss2.png)
+
+在 group2 中找到 2 个 h2 等于 24 的位置 0 和 3 通过比较得知位置 3 的 key 等于 c , 返回位置 3 的 value
+
+#### 例3: get一个元素<key = d, group = 1, h2 = 24>
+![swiss2](./swiss2.png)
+
+在 group1 中找到 2 个 h2 等于 24 的位置 1 和 7 但没有 key 等于 d 并且 group1 中没有空元素，所以我们到 group2 中继续查找位置 0 和 3 ，在位置 0 中 的 key 等于 d， 返回位置 0 的 value
+
+#### 例4: get一个元素<key = f, group = 1, h2 = 24>
+![swiss2](./swiss2.png)
+
+在 group1 中找到 2 个 h2 等于 24 的位置 1 和 7 但没有 key 等于 f 并且 group1 中没有空元素，所以我们到 group2 中继续查找位置 0 和 3 ，也没找到 f ，但我们在 group2 中找到有空元素位置，所以我们判定 f 不存在，返回 nil
 
 ### 3.3 remove方法
 
@@ -225,6 +245,19 @@ func void remove(Object key)
         if i >= groups.length
             i = 0
 ```
+
+#### 例5: del一个元素<key = a, group = 1, h2 = 24>
+![swiss2](./swiss2.png)
+
+我们根据之前的方法定位到元素 a 的位置在 group1 中的位置 1， 由于这个 group 没有其他空元素， 我们只能标记这个节点删除， 删除后如下
+
+![swiss3](./swiss3.png)
+
+#### 例5: del一个元素<key = d, group = 1, h2 = 24>
+
+在 group1 中找到 1 个 h2 等于 24 的位置 7 但没有 key 等于 d 并且 group1 中没有空元素(元素 a 被标记删除)，所以我们到 group2 中继续查找位置 0 和 3，位置 0 中 的 key 等于 d， 由于 group2 中有其他空元素， 所以我们实际删除 d。删除后如下
+
+![swiss4](./swiss4.png)
 
 ### 3.4 resize
 

@@ -37,7 +37,8 @@ static class Node<K,V> implements Map.Entry<K,V> {
 
 ## 2.Swiss table 的结构
 
-Swiss table属于open addressing hash的一个变种，所以是扁平化的，我们先初始化三个数组，meta数组中的每一个byte对应keys数组中的元素的三种状态 `key不存在`，`key存在`，`标记key删除`
+Swiss table 属于开放寻址法的一个变种，所以是扁平化的，我们先初始化三个数组，meta 数组中的每一个 byte 对应 keys 数组中的元素的三种状态 `key不存在`，`key存在`，`标记key删除`。
+使用开放寻址法实现的 map 每个节点仅占用 9 个 byte(1 meta + 4 keyref + 4 valref)，每个节点节省32 - 9 = 23 个字节， 并且内存局部性更好。
 
 ### 2.1 初始化与分组
 
@@ -407,6 +408,16 @@ public long matchEmpty(int offset) {
     long v2 = v1 ^ HI_BITS;
     return (v2 - LO_BITS) & ~v2 & HI_BITS;
 }
+```
+
+### 5.3 性能测试
+
+```
+ Benchmark                            Mode  Cnt          Score         Error  Units
+ SwissMapBenchmark.benchHashMapGet   thrpt    8  597537213.509 ± 5366726.749  ops/s
+ SwissMapBenchmark.benchHashMapPut   thrpt    8    2062104.025 ±   45673.362  ops/s
+ SwissMapBenchmark.benchSwissMapGet  thrpt    8  240013243.613 ±  983660.577  ops/s
+ SwissMapBenchmark.benchSwissMapPut  thrpt    8    2146739.000 ±   61301.517  ops/s
 ```
 
 ## 6. References

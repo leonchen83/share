@@ -154,7 +154,7 @@ func void put(Object key, Object val)
 #### 例1： put一个元素<key = d, group = 1, h2 = 24>
 ![swiss1](./swiss1.png)
 
-在 group1 中找到 2 个 h2 等于 24 的位置 [1, 7] 但没有 key 等于 d，并且 group1 已满，所以到 group2 中继续寻找，位置 3 也不等于 d，但是该组有空元素，所以把 d 插入第一个空的位置 0 
+在 group1 中找到 2 个 h2 等于 24 的位置 [1, 7] 但没有 key 等于 d，并且 group1 没有空元素，所以到 group2 中继续寻找，位置 3 也不等于 d，但是该组有空元素，所以把 d 插入第一个空的位置 0 
 
 ![swiss2](./swiss2.png)
 

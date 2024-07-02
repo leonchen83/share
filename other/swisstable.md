@@ -253,7 +253,7 @@ func void remove(Object key)
 
 ![swiss3](./swiss3.png)
 
-#### 例5: del一个元素<key = d, group = 1, h2 = 24>
+#### 例6: del一个元素<key = d, group = 1, h2 = 24>
 
 在 group1 中找到 1 个 h2 等于 24 的位置 7 但没有 key 等于 d 并且 group1 中没有空元素(元素 a 被标记删除)，所以我们到 group2 中继续查找位置 [0, 3]，位置 0 中 的 key 等于 d， 由于 group2 中有其他空元素， 所以我们实际删除 d。删除后如下
 

@@ -428,3 +428,4 @@ public long matchEmpty(int offset) {
 4. [how-to-see-jit-compiled-code-in-jvm](https://stackoverflow.com/questions/1503479/how-to-see-jit-compiled-code-in-jvm#15146962)
 5. [hsdis download](https://chriswhocodes.com/hsdis/)
 6. [Crash course introduction to parallelism: SIMD Parallelism](https://johnnysswlab.com/crash-course-introduction-to-parallelism-simd-parallelism/)
+7. [Determine if a word has a byte equal to n](https://graphics.stanford.edu/~seander/bithacks.html#ValueInWord)

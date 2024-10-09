@@ -83,7 +83,7 @@ Cross-lane operations: operate on the different lanes of a vector
 
 MAX, MIN, SORT are cross-lanes operations
 ```
-$`\sqrt{x^2+y^2+z^2+...}`$
+$`norm=\sqrt{x^2+y^2+z^2+...}`$
 
 ```java
 

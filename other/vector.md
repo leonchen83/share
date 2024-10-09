@@ -126,6 +126,7 @@ double norm = Math.sqrt(sum);
 ```
 ----------------
 ```java
+VectorSpecies<Double> species = DoubleVector.SPECIES_256;
 
 int n = 17;
 double[] ary = new double[n];
@@ -148,13 +149,18 @@ double norm = Math.sqrt(sum.reduceLanes(VectorOperators.ADD));
 
 ### Vector元素过滤
 ```java
+VectorSpecies<Integer> species = IntVector.SPECIES_128;
 
-int maxIndex = 0;
+int max = 0;
+int[] ary = new int[]{1, 3, 4, 6, 9, 2, 5, 8, 7};
+int[] result = new int[ary.length];
+for (int index = 0; index < ary.length; index += species.length()) {
+    var mask1 = species.indexInRange(index, ary.length);
+    var v = IntVector.fromArray(species, ary, index, mask1);
 
-for() {
-    var mask = v.comare(VectorOperators.GT, 5);
-    v.compress(mask).intoArray(result, maxIndex);
-    maxIndex += mask.trueCount();
+    var mask2 = v.compare(VectorOperators.GT, 5);
+    v = v.compress(mask2);
+    v.intoArray(result, maxIndex);
+    max += mask2.trueCount();
 }
-
 ```

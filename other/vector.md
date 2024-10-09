@@ -15,7 +15,8 @@ marp: true
 Lane-wise operations: operate on a given lane for two vectors
 
 ADD, SUB, etc... are lane-wise operations
-
+```
+```
 Cross-lane operations: operate on the different lanes of a vector
 
 MAX, MIN, SORT are cross-lanes operations

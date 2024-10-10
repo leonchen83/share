@@ -15,6 +15,12 @@ marp: true
 ![simd](./simd.jpg)
 
 ----------------
+* SPECIES_64, SPECIES_128, SPECIES_256, SPECIES_512
+* SPECIES_MAX, SPECIES_PREFERRED
+
+![species](./speices.png)
+
+----------------
 
 ```
 Lane-wise operations: operate on a given lane for two vectors
@@ -24,7 +30,7 @@ ADD, SUB, etc... are lane-wise operations
 ```
 Cross-lane operations: operate on the different lanes of a vector
 
-MAX, MIN, SORT are cross-lanes operations
+MAX, MIN, etc... are cross-lanes operations
 ```
 
 ----------------

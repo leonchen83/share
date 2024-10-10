@@ -6,8 +6,13 @@ marp: true
 ----------------
 
 # 概念
+ * SIMD
  * Species
  * Lanes
+
+----------------
+### Single instruction, multiple data
+![simd](./simd.jpg)
 
 ----------------
 
@@ -21,6 +26,10 @@ Cross-lane operations: operate on the different lanes of a vector
 
 MAX, MIN, SORT are cross-lanes operations
 ```
+
+----------------
+
+![lane](./lane.png)
 
 ----------------
 
@@ -80,6 +89,10 @@ for (int index = 0; index < n; index += species.length()) {
 ```
 ----------------
 
+![mask](./lanewithmask.png)
+
+----------------
+
 ### 数组加法（4）
 ```java
 VectorSpecies<Integer> species = IntVector.SPECIES_128;
@@ -109,10 +122,7 @@ for (; index < n; index++) {
 VectorSpecies<Double> species = DoubleVector.SPECIES_256;
 
 int n = 17;
-double[] ary = new double[n];
-for (int i = 0; i < n; i++) {
-    ary[i] = ThreadLocalRandom.current().nextDouble();
-}
+double[] ary = new double[]{...};
 
 double sum = 0d;
 for (int index = 0; index < n; index += species.length()) {
@@ -129,10 +139,7 @@ double norm = Math.sqrt(sum);
 VectorSpecies<Double> species = DoubleVector.SPECIES_256;
 
 int n = 17;
-double[] ary = new double[n];
-for (int i = 0; i < n; i++) {
-    ary[i] = ThreadLocalRandom.current().nextDouble();
-}
+double[] ary = new double[]{...};
 
 var sum = DoubleVector.zero(species);
 for (int index = 0; index < n; index += species.length()) {
@@ -151,16 +158,16 @@ double norm = Math.sqrt(sum.reduceLanes(VectorOperators.ADD));
 ```java
 VectorSpecies<Integer> species = IntVector.SPECIES_128;
 
-int max = 0;
+int maxIndex = 0;
 int[] ary = new int[]{1, 3, 4, 6, 9, 2, 5, 8, 7};
 int[] result = new int[ary.length];
 for (int index = 0; index < ary.length; index += species.length()) {
     var mask1 = species.indexInRange(index, ary.length);
     var v = IntVector.fromArray(species, ary, index, mask1);
 
-    var mask2 = v.compare(VectorOperators.GT, 5);
+    var mask2 = v.compare(VectorOperators.GT, -1);
     v = v.compress(mask2);
-    v.intoArray(result, maxIndex);
-    max += mask2.trueCount();
+    v.intoArray(result, maxIndex, mask1);
+    maxIndex += mask2.trueCount();
 }
 ```
